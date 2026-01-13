@@ -1,0 +1,50 @@
+<%= labelled_fields_for :psc_control_point, @control_point do |f| %>
+  <%= error_messages_for 'control_point' %>
+
+  <p>
+    <%= f.text_field :control_id, size: 10, maxlength: 20, required: true %>
+    <em class="info"><%= l(:text_psc_control_id_format, prefix: @category.code) %></em>
+  </p>
+
+  <p>
+    <%= f.text_field :name, size: 50, required: true %>
+  </p>
+
+  <p>
+    <%= f.text_area :description, rows: 5, cols: 60 %>
+  </p>
+
+  <p>
+    <%= f.select :frequency,
+                 PscControlPoint::FREQUENCIES.map { |k, v| [v[:label], k] },
+                 { include_blank: false },
+                 required: true %>
+  </p>
+
+  <p>
+    <%= f.select :tracker_id,
+                 Tracker.sorted.map { |t| [t.name, t.id] },
+                 include_blank: true %>
+    <em class="info"><%= l(:text_psc_tracker_help) %></em>
+  </p>
+
+  <p>
+    <%= f.select :priority_id,
+                 IssuePriority.active.map { |p| [p.name, p.id] },
+                 include_blank: true %>
+  </p>
+
+  <p>
+    <%= f.select :assigned_to_id,
+                 principals_options_for_select(Principal.active.sorted),
+                 include_blank: true %>
+  </p>
+
+  <p>
+    <%= f.text_field :position, size: 5 %>
+  </p>
+
+  <p>
+    <%= f.check_box :active %>
+  </p>
+<% end %>

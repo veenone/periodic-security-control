@@ -1,0 +1,88 @@
+<div class="box">
+  <h3><%= l(:label_psc_general_settings) %></h3>
+
+  <p>
+    <label><%= l(:setting_psc_default_project) %></label>
+    <%= select_tag 'settings[default_project_id]',
+        options_from_collection_for_select(Project.active.sorted, :id, :name, settings['default_project_id']),
+        include_blank: true %>
+    <em class="info"><%= l(:text_psc_default_project_help) %></em>
+  </p>
+
+  <p>
+    <label><%= l(:setting_psc_issue_author) %></label>
+    <%= select_tag 'settings[issue_author_id]',
+        principals_options_for_select(User.active.sorted, settings['issue_author_id'].to_i),
+        include_blank: true %>
+    <em class="info"><%= l(:text_psc_issue_author_help) %></em>
+  </p>
+
+  <p>
+    <label><%= l(:setting_psc_advance_days) %></label>
+    <%= text_field_tag 'settings[advance_days]', settings['advance_days'], size: 5 %>
+    <em class="info"><%= l(:text_psc_advance_days_help) %></em>
+  </p>
+
+  <p>
+    <label><%= l(:setting_psc_enable_auto_generation) %></label>
+    <%= hidden_field_tag 'settings[enable_auto_generation]', 'false' %>
+    <%= check_box_tag 'settings[enable_auto_generation]', 'true', settings['enable_auto_generation'] == 'true' %>
+    <em class="info"><%= l(:text_psc_enable_auto_generation_help) %></em>
+  </p>
+</div>
+
+<div class="box">
+  <h3><%= l(:label_psc_issue_templates) %></h3>
+
+  <p>
+    <label><%= l(:setting_psc_issue_subject_template) %></label>
+    <%= text_field_tag 'settings[issue_subject_template]', settings['issue_subject_template'], size: 80 %>
+  </p>
+
+  <p>
+    <label><%= l(:setting_psc_issue_description_template) %></label>
+    <%= text_area_tag 'settings[issue_description_template]', settings['issue_description_template'], rows: 8, cols: 80 %>
+  </p>
+
+  <p class="info">
+    <strong><%= l(:label_psc_available_variables) %>:</strong><br>
+    <code>{{control_id}}</code> - <%= l(:text_psc_var_control_id) %><br>
+    <code>{{control_name}}</code> - <%= l(:text_psc_var_control_name) %><br>
+    <code>{{category}}</code> - <%= l(:text_psc_var_category) %><br>
+    <code>{{period}}</code> - <%= l(:text_psc_var_period) %><br>
+    <code>{{year}}</code> - <%= l(:text_psc_var_year) %><br>
+    <code>{{frequency}}</code> - <%= l(:text_psc_var_frequency) %><br>
+    <code>{{scheduled_date}}</code> - <%= l(:text_psc_var_scheduled_date) %><br>
+    <code>{{due_date}}</code> - <%= l(:text_psc_var_due_date) %>
+  </p>
+</div>
+
+<div class="box">
+  <h3><%= l(:label_psc_maintenance) %></h3>
+
+  <p>
+    <%= l(:text_psc_cron_setup) %>
+  </p>
+
+  <pre class="psc-cron-example">
+# Daily at 6 AM - generate issues for due schedules
+0 6 * * * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_security_control:generate_issues
+
+# Daily at midnight - update overdue statuses
+0 0 * * * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_security_control:update_overdue
+
+# December 1st - generate next year schedules
+0 0 1 12 * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_security_control:generate_next_year_schedules
+  </pre>
+
+  <p>
+    <strong><%= l(:label_psc_available_rake_tasks) %>:</strong>
+  </p>
+  <ul>
+    <li><code>rake periodic_security_control:generate_issues</code> - <%= l(:text_psc_rake_generate_issues) %></li>
+    <li><code>rake periodic_security_control:update_overdue</code> - <%= l(:text_psc_rake_update_overdue) %></li>
+    <li><code>rake periodic_security_control:generate_schedules[YEAR]</code> - <%= l(:text_psc_rake_generate_schedules) %></li>
+    <li><code>rake periodic_security_control:statistics[YEAR]</code> - <%= l(:text_psc_rake_statistics) %></li>
+    <li><code>rake periodic_security_control:seed</code> - <%= l(:text_psc_rake_seed) %></li>
+  </ul>
+</div>

@@ -1,0 +1,36 @@
+<% if @project.module_enabled?(:periodic_security_control) && User.current.allowed_to?(:view_psc_schedules, @project) %>
+  <%
+    year = Date.current.year
+    schedules = PscSchedule.for_year(year)
+    total = schedules.count
+    completed = schedules.completed.count
+    overdue = schedules.overdue.count
+    completion_rate = total.positive? ? (completed.to_f / total * 100).round(0) : 0
+  %>
+
+  <% if total.positive? %>
+    <h3><%= l(:label_psc_security_controls) %></h3>
+
+    <div class="psc-sidebar-stats">
+      <p>
+        <strong><%= l(:label_psc_year) %>:</strong> <%= year %><br>
+        <strong><%= l(:label_psc_completion_rate) %>:</strong> <%= completion_rate %>%
+      </p>
+
+      <div class="psc-progress-bar">
+        <div class="psc-progress-fill" style="width: <%= completion_rate %>%;"></div>
+      </div>
+
+      <p class="psc-sidebar-counts">
+        <span class="psc-count-completed"><%= completed %> <%= l(:label_psc_completed_short) %></span>
+        <% if overdue.positive? %>
+          <span class="psc-count-overdue"><%= overdue %> <%= l(:label_psc_overdue_short) %></span>
+        <% end %>
+      </p>
+
+      <p>
+        <%= link_to l(:label_psc_view_dashboard), psc_dashboard_path, class: 'icon icon-stats' %>
+      </p>
+    </div>
+  <% end %>
+<% end %>

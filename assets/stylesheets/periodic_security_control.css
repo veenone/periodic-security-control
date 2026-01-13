@@ -1,0 +1,346 @@
+/* Periodic Security Control Plugin Styles */
+
+/* Status colors */
+.psc-status-pending { color: #666; }
+.psc-status-generated { color: #3498db; }
+.psc-status-completed { color: #27ae60; }
+.psc-status-overdue { color: #e74c3c; }
+.psc-status-skipped { color: #95a5a6; }
+
+/* Status badges */
+.psc-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.psc-status.psc-status-pending { background: #f0f0f0; }
+.psc-status.psc-status-generated { background: #d4edfc; }
+.psc-status.psc-status-completed { background: #d4edda; }
+.psc-status.psc-status-overdue { background: #f8d7da; }
+.psc-status.psc-status-skipped { background: #e2e3e5; }
+
+/* Dashboard Summary Cards */
+.psc-summary-cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.psc-card {
+  flex: 1;
+  min-width: 150px;
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.psc-card-value {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.psc-card-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.psc-card-total .psc-card-value { color: #333; }
+.psc-card-completed .psc-card-value { color: #27ae60; }
+.psc-card-pending .psc-card-value { color: #f39c12; }
+.psc-card-overdue .psc-card-value { color: #e74c3c; }
+
+/* Monthly Progress Chart */
+.psc-monthly-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 150px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.psc-month-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100% / 12 - 5px);
+}
+
+.psc-bar-container {
+  width: 100%;
+  height: 100px;
+  background: #e9ecef;
+  border-radius: 3px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.psc-bar-fill {
+  width: 100%;
+  background: #27ae60;
+  border-radius: 3px;
+  transition: height 0.3s ease;
+}
+
+.psc-bar-label {
+  font-size: 11px;
+  margin-top: 5px;
+  color: #666;
+}
+
+.psc-bar-value {
+  font-size: 10px;
+  color: #999;
+}
+
+/* Section styling */
+.psc-section {
+  margin-bottom: 20px;
+}
+
+.psc-section h3 {
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Compact table */
+.psc-compact-table {
+  font-size: 12px;
+}
+
+.psc-compact-table td, .psc-compact-table th {
+  padding: 5px 8px;
+}
+
+.psc-days-overdue {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* Category code badge */
+.psc-category-code {
+  font-size: 11px;
+  color: #999;
+}
+
+/* Mini progress bar */
+.psc-mini-progress {
+  display: inline-block;
+  width: 60px;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.psc-mini-bar {
+  height: 100%;
+  background: #27ae60;
+  border-radius: 4px;
+}
+
+/* Calendar styles */
+.psc-calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+.psc-current-month {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.psc-nav-link {
+  padding: 5px 10px;
+}
+
+.psc-calendar {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.psc-calendar th {
+  background: #f8f9fa;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #dee2e6;
+}
+
+.psc-calendar td {
+  border: 1px solid #dee2e6;
+  padding: 5px;
+  vertical-align: top;
+  height: 100px;
+}
+
+.psc-calendar td.other-month {
+  background: #f8f9fa;
+  color: #999;
+}
+
+.psc-calendar td.today {
+  background: #fffde7;
+}
+
+.psc-day-number {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.psc-day-schedules {
+  font-size: 11px;
+}
+
+.psc-schedule-item {
+  padding: 2px 4px;
+  margin: 2px 0;
+  border-radius: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.psc-schedule-item.psc-status-pending { background: #f0f0f0; }
+.psc-schedule-item.psc-status-generated { background: #d4edfc; }
+.psc-schedule-item.psc-status-completed { background: #d4edda; }
+.psc-schedule-item.psc-status-overdue { background: #f8d7da; }
+.psc-schedule-item.psc-status-skipped { background: #e2e3e5; }
+
+.psc-calendar-legend {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+.psc-legend-item {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* Filter form */
+.psc-filter-form fieldset {
+  margin-bottom: 15px;
+}
+
+.psc-filter-form label {
+  margin-right: 5px;
+}
+
+.psc-filter-form select, .psc-filter-form input {
+  margin-right: 15px;
+}
+
+/* Year selector */
+.psc-year-selector {
+  display: inline;
+}
+
+/* Overdue badge */
+.psc-overdue-badge {
+  color: #e74c3c;
+  font-size: 11px;
+}
+
+/* Sidebar styles */
+.psc-sidebar-stats {
+  font-size: 12px;
+}
+
+.psc-progress-bar {
+  height: 10px;
+  background: #e9ecef;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.psc-progress-fill {
+  height: 100%;
+  background: #27ae60;
+  border-radius: 5px;
+}
+
+.psc-sidebar-counts {
+  display: flex;
+  gap: 10px;
+}
+
+.psc-count-completed { color: #27ae60; }
+.psc-count-overdue { color: #e74c3c; }
+
+/* Issue details table */
+.psc-issue-details th {
+  text-align: right;
+  padding-right: 10px;
+  width: 120px;
+}
+
+/* Inactive rows */
+tr.inactive {
+  opacity: 0.6;
+}
+
+/* Cron example */
+.psc-cron-example {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  overflow-x: auto;
+}
+
+/* Table enhancements */
+.psc-categories-table .control-points-count,
+.psc-schedules-table .year,
+.psc-schedules-table .period {
+  text-align: center;
+}
+
+/* Buttons in tables */
+.psc-categories-table .buttons,
+.psc-control-points-table .buttons,
+.psc-schedules-table .buttons {
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .psc-summary-cards {
+    flex-direction: column;
+  }
+
+  .psc-card {
+    min-width: 100%;
+  }
+
+  .psc-monthly-chart {
+    overflow-x: auto;
+  }
+
+  .psc-calendar td {
+    height: 80px;
+    font-size: 10px;
+  }
+}

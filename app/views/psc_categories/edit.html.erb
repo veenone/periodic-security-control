@@ -1,0 +1,14 @@
+<%= title l(:label_psc_category_edit) %>
+
+<h2><%= l(:label_psc_category_edit) %>: <%= @category.name %></h2>
+
+<%= form_tag(psc_category_path(@category), method: :patch) do %>
+  <div class="box tabular">
+    <%= render partial: 'form' %>
+  </div>
+
+  <p>
+    <%= submit_tag l(:button_save) %>
+    <%= link_to l(:button_cancel), psc_categories_path %>
+  </p>
+<% end %>

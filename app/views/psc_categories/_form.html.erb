@@ -1,0 +1,24 @@
+<%= labelled_fields_for :psc_control_category, @category do |f| %>
+  <%= error_messages_for 'category' %>
+
+  <p>
+    <%= f.text_field :code, size: 5, maxlength: 5, required: true %>
+    <em class="info"><%= l(:text_psc_code_format) %></em>
+  </p>
+
+  <p>
+    <%= f.text_field :name, size: 50, required: true %>
+  </p>
+
+  <p>
+    <%= f.text_area :description, rows: 5, cols: 60 %>
+  </p>
+
+  <p>
+    <%= f.text_field :position, size: 5 %>
+  </p>
+
+  <p>
+    <%= f.check_box :active %>
+  </p>
+<% end %>

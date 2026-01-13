@@ -1,0 +1,159 @@
+<%= title l(:label_psc_dashboard) %>
+
+<div class="contextual">
+  <%= form_tag(psc_dashboard_path, method: :get, class: 'psc-year-selector') do %>
+    <%= l(:field_year) %>:
+    <%= select_tag :year, options_for_select((Date.current.year - 2..Date.current.year + 1).to_a.reverse, @year), onchange: 'this.form.submit();' %>
+  <% end %>
+  <%= link_to l(:label_psc_calendar), psc_dashboard_calendar_path(year: @year), class: 'icon icon-calendar' %>
+  <%= link_to l(:label_psc_schedules), psc_schedules_path(year: @year), class: 'icon icon-list' %>
+</div>
+
+<h2><%= l(:label_psc_dashboard) %> - <%= @year %></h2>
+
+<!-- Summary Cards -->
+<div class="psc-summary-cards">
+  <div class="psc-card psc-card-total">
+    <div class="psc-card-value"><%= @statistics[:total] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_total) %></div>
+  </div>
+  <div class="psc-card psc-card-completed">
+    <div class="psc-card-value"><%= @statistics[:completed] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_completed) %> (<%= @statistics[:completion_rate] %>%)</div>
+  </div>
+  <div class="psc-card psc-card-pending">
+    <div class="psc-card-value"><%= @statistics[:pending] + @statistics[:generated] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_pending) %></div>
+  </div>
+  <div class="psc-card psc-card-overdue">
+    <div class="psc-card-value"><%= @statistics[:overdue] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_overdue) %></div>
+  </div>
+</div>
+
+<!-- Monthly Progress -->
+<div class="psc-section">
+  <h3><%= l(:label_psc_monthly_progress) %></h3>
+  <div class="psc-monthly-chart">
+    <% @monthly_data.each do |month| %>
+      <div class="psc-month-bar">
+        <div class="psc-bar-container">
+          <div class="psc-bar-fill" style="height: <%= month[:completion_rate] %>%;"
+               title="<%= month[:completed] %>/<%= month[:total] %> (<%= month[:completion_rate] %>%)"></div>
+        </div>
+        <div class="psc-bar-label"><%= month[:month_abbr] %></div>
+        <div class="psc-bar-value"><%= month[:completion_rate] %>%</div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="splitcontentleft">
+  <!-- Overdue Controls -->
+  <div class="psc-section">
+    <h3><%= l(:label_psc_overdue_controls) %></h3>
+    <% if @overdue_schedules.any? %>
+      <table class="list psc-compact-table">
+        <thead>
+          <tr>
+            <th><%= l(:field_control_id) %></th>
+            <th><%= l(:field_due_date) %></th>
+            <th><%= l(:label_psc_days_late) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @overdue_schedules.each do |schedule| %>
+            <tr class="psc-status-overdue">
+              <td>
+                <%= link_to schedule.control_point.full_control_id,
+                    psc_category_psc_control_point_path(schedule.control_point.category, schedule.control_point) %>
+              </td>
+              <td><%= format_date(schedule.due_date) %></td>
+              <td class="psc-days-overdue"><%= schedule.days_overdue %> <%= l(:label_days) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <% if @statistics[:overdue] > 10 %>
+        <p><%= link_to l(:label_psc_view_all_overdue), psc_schedules_path(year: @year, status: 'overdue') %></p>
+      <% end %>
+    <% else %>
+      <p class="nodata"><%= l(:label_psc_no_overdue) %></p>
+    <% end %>
+  </div>
+</div>
+
+<div class="splitcontentright">
+  <!-- Upcoming Controls -->
+  <div class="psc-section">
+    <h3><%= l(:label_psc_upcoming_controls) %></h3>
+    <% if @upcoming_schedules.any? %>
+      <table class="list psc-compact-table">
+        <thead>
+          <tr>
+            <th><%= l(:field_control_id) %></th>
+            <th><%= l(:field_scheduled_date) %></th>
+            <th><%= l(:label_psc_days_until) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @upcoming_schedules.each do |schedule| %>
+            <tr>
+              <td>
+                <%= link_to schedule.control_point.full_control_id,
+                    psc_category_psc_control_point_path(schedule.control_point.category, schedule.control_point) %>
+              </td>
+              <td><%= format_date(schedule.scheduled_date) %></td>
+              <td><%= schedule.days_until_due || '-' %> <%= l(:label_days) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="nodata"><%= l(:label_psc_no_upcoming) %></p>
+    <% end %>
+  </div>
+</div>
+
+<div style="clear: both;"></div>
+
+<!-- Category Breakdown -->
+<div class="psc-section">
+  <h3><%= l(:label_psc_category_breakdown) %></h3>
+  <table class="list psc-categories-table">
+    <thead>
+      <tr>
+        <th><%= l(:label_psc_category) %></th>
+        <th class="center"><%= l(:label_psc_total) %></th>
+        <th class="center"><%= l(:label_psc_completed) %></th>
+        <th class="center"><%= l(:label_psc_pending) %></th>
+        <th class="center"><%= l(:label_psc_overdue) %></th>
+        <th class="center"><%= l(:label_psc_completion_rate) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @category_stats.each do |stat| %>
+        <tr>
+          <td>
+            <%= link_to stat[:category].name, psc_category_path(stat[:category]) %>
+            <span class="psc-category-code">(<%= stat[:category].code %>)</span>
+          </td>
+          <td class="center"><%= stat[:total] %></td>
+          <td class="center psc-status-completed"><%= stat[:completed] %></td>
+          <td class="center"><%= stat[:pending] %></td>
+          <td class="center psc-status-overdue"><%= stat[:overdue] %></td>
+          <td class="center">
+            <div class="psc-mini-progress">
+              <div class="psc-mini-bar" style="width: <%= stat[:completion_rate] %>%;"></div>
+            </div>
+            <%= stat[:completion_rate] %>%
+          </td>
+          <td>
+            <%= link_to l(:label_psc_view), psc_schedules_path(year: @year, category_id: stat[:category].id), class: 'icon icon-list' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

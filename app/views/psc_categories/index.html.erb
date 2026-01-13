@@ -1,0 +1,65 @@
+<%= title l(:label_psc_categories) %>
+
+<div class="contextual">
+  <%= link_to l(:label_psc_category_new), new_psc_category_path, class: 'icon icon-add' %>
+  <%= link_to l(:label_psc_export), export_psc_categories_path(format: :csv), class: 'icon icon-download' %>
+</div>
+
+<h2><%= l(:label_psc_categories) %></h2>
+
+<%= form_tag(import_psc_categories_path, multipart: true, class: 'psc-import-form') do %>
+  <fieldset class="collapsible collapsed">
+    <legend onclick="toggleFieldset(this);"><%= l(:label_psc_import) %></legend>
+    <div style="display: none;">
+      <p>
+        <%= file_field_tag 'file', accept: '.csv' %>
+        <%= submit_tag l(:button_import), class: 'small' %>
+      </p>
+      <p class="info"><%= l(:text_psc_import_help) %></p>
+    </div>
+  </fieldset>
+<% end %>
+
+<% if @categories.any? %>
+  <table class="list psc-categories-table">
+    <thead>
+      <tr>
+        <th><%= sort_header_tag('position', caption: '#', default_order: 'asc') %></th>
+        <th><%= sort_header_tag('code', caption: l(:field_code)) %></th>
+        <th><%= sort_header_tag('name', caption: l(:field_name)) %></th>
+        <th><%= l(:label_psc_control_points_count) %></th>
+        <th><%= l(:field_active) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @categories.each do |category| %>
+        <tr class="<%= cycle('odd', 'even') %> <%= 'inactive' unless category.active %>">
+          <td class="position"><%= category.position %></td>
+          <td class="code"><strong><%= category.code %></strong></td>
+          <td class="name">
+            <%= link_to category.name, psc_category_path(category) %>
+            <% if category.description.present? %>
+              <br><span class="description"><%= truncate(category.description, length: 100) %></span>
+            <% end %>
+          </td>
+          <td class="control-points-count">
+            <%= link_to category.control_points.active.count, psc_category_path(category) %>
+          </td>
+          <td class="active">
+            <%= checked_image(category.active) %>
+          </td>
+          <td class="buttons">
+            <%= link_to l(:button_edit), edit_psc_category_path(category), class: 'icon icon-edit' %>
+            <%= link_to l(:button_delete), psc_category_path(category),
+                        method: :delete,
+                        data: { confirm: l(:text_are_you_sure) },
+                        class: 'icon icon-del' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

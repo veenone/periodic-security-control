@@ -1,0 +1,103 @@
+<%= title "#{@control_point.full_control_id} - #{@control_point.name}" %>
+
+<div class="contextual">
+  <%= link_to l(:button_edit), edit_psc_category_psc_control_point_path(@category, @control_point), class: 'icon icon-edit' %>
+  <%= form_tag(generate_schedules_psc_category_psc_control_point_path(@category, @control_point), method: :post, style: 'display: inline;') do %>
+    <%= select_tag :year, options_for_select((Date.current.year - 1..Date.current.year + 2).to_a, Date.current.year) %>
+    <%= submit_tag l(:label_psc_generate_schedules_short), class: 'small' %>
+  <% end %>
+</div>
+
+<h2><%= @control_point.full_control_id %> - <%= @control_point.name %></h2>
+
+<div class="splitcontentleft">
+  <fieldset class="box">
+    <legend><%= l(:label_information) %></legend>
+    <p>
+      <strong><%= l(:field_control_id) %>:</strong> <%= @control_point.full_control_id %><br>
+      <strong><%= l(:field_name) %>:</strong> <%= @control_point.name %><br>
+      <strong><%= l(:label_psc_category) %>:</strong> <%= link_to @category.name, psc_category_path(@category) %><br>
+      <strong><%= l(:field_frequency) %>:</strong> <%= @control_point.frequency_label %><br>
+      <strong><%= l(:field_tracker) %>:</strong> <%= @control_point.tracker&.name || '-' %><br>
+      <strong><%= l(:field_priority) %>:</strong> <%= @control_point.priority&.name || '-' %><br>
+      <strong><%= l(:field_assigned_to) %>:</strong> <%= @control_point.assigned_to&.name || '-' %><br>
+      <strong><%= l(:field_active) %>:</strong> <%= checked_image(@control_point.active) %><br>
+      <% if @control_point.description.present? %>
+        <strong><%= l(:field_description) %>:</strong><br>
+        <%= simple_format(@control_point.description) %>
+      <% end %>
+    </p>
+  </fieldset>
+</div>
+
+<div class="splitcontentright">
+  <fieldset class="box">
+    <legend><%= l(:label_statistics) %></legend>
+    <p>
+      <strong><%= l(:label_psc_last_completed) %>:</strong>
+      <% if (last = @control_point.last_completed_schedule) %>
+        <%= last.period_label %> <%= last.year %>
+        (<%= format_date(last.completed_at) %>)
+      <% else %>
+        -
+      <% end %><br>
+      <strong><%= l(:label_psc_overdue_count) %>:</strong> <%= @control_point.overdue_schedules_count %>
+    </p>
+  </fieldset>
+</div>
+
+<div style="clear: both;"></div>
+
+<h3><%= l(:label_psc_schedules) %></h3>
+
+<% if @schedules.any? %>
+  <table class="list psc-schedules-table">
+    <thead>
+      <tr>
+        <th><%= l(:field_year) %></th>
+        <th><%= l(:field_period) %></th>
+        <th><%= l(:field_scheduled_date) %></th>
+        <th><%= l(:field_due_date) %></th>
+        <th><%= l(:field_status) %></th>
+        <th><%= l(:field_issue) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @schedules.each do |schedule| %>
+        <tr class="<%= cycle('odd', 'even') %> <%= schedule.status_css_class %>">
+          <td class="year"><%= schedule.year %></td>
+          <td class="period"><%= schedule.period_label %></td>
+          <td class="scheduled-date"><%= format_date(schedule.scheduled_date) %></td>
+          <td class="due-date"><%= format_date(schedule.due_date) %></td>
+          <td class="status">
+            <span class="psc-status <%= schedule.status_css_class %>">
+              <%= l("psc_status_#{schedule.status}") %>
+            </span>
+          </td>
+          <td class="issue">
+            <% if schedule.issue %>
+              <%= link_to "##{schedule.issue.id}", issue_path(schedule.issue) %>
+            <% else %>
+              -
+            <% end %>
+          </td>
+          <td class="buttons">
+            <% if schedule.pending? %>
+              <%= link_to l(:label_psc_generate_issue), generate_issue_psc_schedule_path(schedule),
+                          method: :post, class: 'icon icon-add' %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="pagination"><%= pagination_links_full @schedules %></p>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>
+
+<p>
+  <%= link_to l(:button_back), psc_category_path(@category) %>
+</p>

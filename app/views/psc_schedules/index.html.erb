@@ -1,0 +1,91 @@
+<%= title l(:label_psc_schedules) %>
+
+<div class="contextual">
+  <%= link_to l(:label_psc_calendar), calendar_psc_schedules_path(year: @year), class: 'icon icon-calendar' %>
+  <%= link_to l(:label_psc_bulk_generate), bulk_generate_psc_schedules_path, method: :post, class: 'icon icon-reload',
+              data: { confirm: l(:text_psc_bulk_generate_confirm) } %>
+</div>
+
+<h2><%= l(:label_psc_schedules) %></h2>
+
+<%= form_tag(psc_schedules_path, method: :get, class: 'psc-filter-form') do %>
+  <fieldset>
+    <legend><%= l(:label_filter) %></legend>
+    <p>
+      <label><%= l(:field_year) %>:</label>
+      <%= select_tag :year, options_for_select((Date.current.year - 2..Date.current.year + 1).to_a.reverse, @year) %>
+
+      <label><%= l(:field_status) %>:</label>
+      <%= select_tag :status, options_for_select([['', '']] + PscSchedule::STATUSES.map { |s| [l("psc_status_#{s}"), s] }, @status_filter) %>
+
+      <label><%= l(:label_psc_category) %>:</label>
+      <%= select_tag :category_id, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @category_filter) %>
+
+      <%= submit_tag l(:button_apply), name: nil %>
+      <%= link_to l(:button_clear), psc_schedules_path %>
+    </p>
+  </fieldset>
+<% end %>
+
+<% if @schedules.any? %>
+  <table class="list psc-schedules-table">
+    <thead>
+      <tr>
+        <th><%= l(:label_psc_category) %></th>
+        <th><%= l(:field_control_id) %></th>
+        <th><%= l(:field_name) %></th>
+        <th><%= sort_header_tag('scheduled_date', caption: l(:field_scheduled_date)) %></th>
+        <th><%= sort_header_tag('due_date', caption: l(:field_due_date)) %></th>
+        <th><%= sort_header_tag('status', caption: l(:field_status)) %></th>
+        <th><%= l(:field_issue) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @schedules.each do |schedule| %>
+        <tr class="<%= cycle('odd', 'even') %> <%= schedule.status_css_class %>">
+          <td class="category"><%= schedule.control_point.category.code %></td>
+          <td class="control-id"><strong><%= schedule.control_point.full_control_id %></strong></td>
+          <td class="name"><%= truncate(schedule.control_point.name, length: 40) %></td>
+          <td class="scheduled-date"><%= format_date(schedule.scheduled_date) %></td>
+          <td class="due-date">
+            <%= format_date(schedule.due_date) %>
+            <% if schedule.overdue? %>
+              <span class="psc-overdue-badge">(<%= l(:label_psc_days_overdue, days: schedule.days_overdue) %>)</span>
+            <% end %>
+          </td>
+          <td class="status">
+            <span class="psc-status <%= schedule.status_css_class %>">
+              <%= l("psc_status_#{schedule.status}") %>
+            </span>
+          </td>
+          <td class="issue">
+            <% if schedule.issue %>
+              <%= link_to "##{schedule.issue.id}", issue_path(schedule.issue) %>
+            <% else %>
+              -
+            <% end %>
+          </td>
+          <td class="buttons">
+            <% if schedule.pending? %>
+              <%= link_to l(:label_psc_generate_issue_short), generate_issue_psc_schedule_path(schedule),
+                          method: :post, class: 'icon icon-add', title: l(:label_psc_generate_issue) %>
+              <%= link_to l(:button_skip), skip_psc_schedule_path(schedule),
+                          method: :post, class: 'icon icon-cancel', title: l(:label_psc_skip) %>
+            <% elsif schedule.generated? %>
+              <%= link_to l(:button_complete), complete_psc_schedule_path(schedule),
+                          method: :post, class: 'icon icon-checked', title: l(:label_psc_complete) %>
+            <% elsif schedule.completed? || schedule.skipped? %>
+              <%= link_to l(:button_reopen), reopen_psc_schedule_path(schedule),
+                          method: :post, class: 'icon icon-reload', title: l(:label_psc_reopen) %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="pagination"><%= pagination_links_full @schedules %></p>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

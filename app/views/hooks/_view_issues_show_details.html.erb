@@ -1,0 +1,39 @@
+<% if @issue.psc_linked? %>
+  <% schedule = @issue.psc_schedule %>
+  <% control_point = schedule.control_point %>
+
+  <hr>
+  <p>
+    <strong><%= l(:label_psc_linked_control) %>:</strong>
+  </p>
+  <table class="attributes psc-issue-details">
+    <tr>
+      <th><%= l(:field_control_id) %>:</th>
+      <td><%= link_to control_point.full_control_id, psc_category_psc_control_point_path(control_point.category, control_point) %></td>
+    </tr>
+    <tr>
+      <th><%= l(:field_name) %>:</th>
+      <td><%= control_point.name %></td>
+    </tr>
+    <tr>
+      <th><%= l(:label_psc_category) %>:</th>
+      <td><%= link_to control_point.category.name, psc_category_path(control_point.category) %></td>
+    </tr>
+    <tr>
+      <th><%= l(:field_frequency) %>:</th>
+      <td><%= control_point.frequency_label %></td>
+    </tr>
+    <tr>
+      <th><%= l(:field_period) %>:</th>
+      <td><%= schedule.period_label %> <%= schedule.year %></td>
+    </tr>
+    <tr>
+      <th><%= l(:label_psc_schedule_status) %>:</th>
+      <td>
+        <span class="psc-status <%= schedule.status_css_class %>">
+          <%= l("psc_status_#{schedule.status}") %>
+        </span>
+      </td>
+    </tr>
+  </table>
+<% end %>
