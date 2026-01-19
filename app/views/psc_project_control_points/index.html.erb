@@ -31,7 +31,6 @@
       <tr>
         <th><%= sort_header_tag('control_id', caption: l(:field_control_id)) %></th>
         <th><%= sort_header_tag('name', caption: l(:field_name)) %></th>
-        <th><%= l(:label_psc_category) %></th>
         <th><%= l(:field_owner) %></th>
         <th><%= sort_header_tag('frequency', caption: l(:field_frequency)) %></th>
         <th><%= l(:field_assigned_to) %></th>
@@ -50,9 +49,6 @@
             <% if cp.description.present? %>
               <br><span class="description"><%= truncate(cp.description, length: 60) %></span>
             <% end %>
-          </td>
-          <td class="category">
-            <%= link_to cp.category.code, project_psc_category_path(@project, cp.category) %>
           </td>
           <td class="owner"><%= cp.owner&.name || '-' %></td>
           <td class="frequency"><%= cp.frequency_label %></td>
