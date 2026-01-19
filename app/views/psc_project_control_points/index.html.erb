@@ -29,12 +29,12 @@
   <table class="list psc-control-points-table">
     <thead>
       <tr>
-        <th><%= sort_header_tag('control_id', caption: l(:field_control_id)) %></th>
-        <th><%= sort_header_tag('name', caption: l(:field_name)) %></th>
+        <%= sort_header_tag('control_id', caption: l(:field_control_id)) %>
+        <%= sort_header_tag('name', caption: l(:field_name)) %>
         <th><%= l(:field_owner) %></th>
-        <th><%= sort_header_tag('frequency', caption: l(:field_frequency)) %></th>
+        <%= sort_header_tag('frequency', caption: l(:field_frequency)) %>
         <th><%= l(:field_assigned_to) %></th>
-        <th><%= sort_header_tag('active', caption: l(:field_status)) %></th>
+        <%= sort_header_tag('active', caption: l(:field_status)) %>
         <th><%= l(:label_actions) %></th>
       </tr>
     </thead>
