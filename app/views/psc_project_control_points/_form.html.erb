@@ -32,7 +32,7 @@
 
   <p>
     <%= f.select :tracker_id,
-                 Tracker.sorted.map { |t| [t.name, t.id] },
+                 @project.trackers.sorted.map { |t| [t.name, t.id] },
                  include_blank: true %>
     <em class="info"><%= l(:text_psc_tracker_help) %></em>
   </p>
