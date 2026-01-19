@@ -22,11 +22,10 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
 
   has_one :project, through: :category
 
-  validates :control_id, presence: true
+  validates :control_id, presence: true, uniqueness: { scope: :category_id, case_sensitive: false }
   validates :name, presence: true
   validates :frequency, presence: true, inclusion: { in: FREQUENCIES.keys }
   validates :category, presence: true
-  validate :control_id_unique_within_project
 
   before_validation :format_control_id
 
@@ -49,7 +48,7 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   end
 
   def full_control_id
-    control_id.upcase
+    "#{category&.code}#{control_id}".upcase
   end
 
   def frequency_config
@@ -132,17 +131,6 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
 
   def format_control_id
     self.control_id = control_id.upcase.strip if control_id.present?
-  end
-
-  def control_id_unique_within_project
-    return unless control_id.present? && category.present? && category.project_id.present?
-
-    existing = PscControlPoint.joins(:category)
-                              .where(psc_control_categories: { project_id: category.project_id })
-                              .where('UPPER(psc_control_points.control_id) = ?', control_id.upcase)
-                              .where.not(id: id)
-
-    errors.add(:control_id, :taken) if existing.exists?
   end
 
   def calculate_next_date(from_date)

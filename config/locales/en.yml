@@ -136,8 +136,8 @@ en:
 
   # Code format
   text_psc_code_format: "2-5 uppercase letters (e.g., ACS, VSS)"
-  text_psc_control_id_format: "Unique identifier (will be prefixed with %{prefix} if not already)"
-  text_psc_control_id_info: "Unique identifier within the category (e.g., 01, 02, A1)"
+  text_psc_control_id_format: "Control number within this category (e.g., 01, 02). Full ID: %{prefix}01, %{prefix}02"
+  text_psc_control_id_info: "Control number within category (e.g., 01, 02). Full ID: CategoryCode + Number"
   text_psc_tracker_help: "Leave blank to use project default"
   text_psc_owner_help: "Person responsible for this control point"
 
