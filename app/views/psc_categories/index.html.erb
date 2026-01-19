@@ -24,12 +24,12 @@
   <table class="list psc-categories-table">
     <thead>
       <tr>
-        <th><%= sort_header_tag('position', caption: '#', default_order: 'asc') %></th>
-        <th><%= sort_header_tag('code', caption: l(:field_code)) %></th>
-        <th><%= sort_header_tag('name', caption: l(:field_name)) %></th>
+        <%= sort_header_tag('position', caption: '#', default_order: 'asc') %>
+        <%= sort_header_tag('code', caption: l(:field_code)) %>
+        <%= sort_header_tag('name', caption: l(:field_name)) %>
         <th><%= l(:label_psc_control_points_count) %></th>
         <th><%= l(:field_active) %></th>
-        <th></th>
+        <th><%= l(:label_actions) %></th>
       </tr>
     </thead>
     <tbody>
