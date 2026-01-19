@@ -18,6 +18,7 @@ en:
   label_psc_control_point: "Control Point"
   label_psc_control_point_new: "New Control Point"
   label_psc_control_point_edit: "Edit Control Point"
+  label_actions: "Actions"
 
   # Schedules
   label_psc_schedule: "Schedule"
