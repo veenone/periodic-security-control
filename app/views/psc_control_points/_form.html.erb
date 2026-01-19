@@ -2,11 +2,6 @@
   <%= error_messages_for 'control_point' %>
 
   <p>
-    <%= f.text_field :control_id, size: 10, maxlength: 20, required: true %>
-    <em class="info"><%= l(:text_psc_control_id_format, prefix: @category.code) %></em>
-  </p>
-
-  <p>
     <%= f.text_field :name, size: 50, required: true %>
   </p>
 

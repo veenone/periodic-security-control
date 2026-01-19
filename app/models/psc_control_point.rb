@@ -27,6 +27,7 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   validates :frequency, presence: true, inclusion: { in: FREQUENCIES.keys }
   validates :category, presence: true
 
+  before_validation :generate_control_id, on: :create
   before_validation :format_control_id
 
   acts_as_positioned scope: [:category_id]
@@ -128,6 +129,16 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   end
 
   private
+
+  def generate_control_id
+    return if control_id.present? || category_id.blank?
+
+    max_number = PscControlPoint.where(category_id: category_id)
+                                .pluck(:control_id)
+                                .map { |id| id.to_s.scan(/\d+/).last.to_i }
+                                .max || 0
+    self.control_id = format('%02d', max_number + 1)
+  end
 
   def format_control_id
     self.control_id = control_id.upcase.strip if control_id.present?
