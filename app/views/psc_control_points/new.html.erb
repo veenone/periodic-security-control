@@ -3,13 +3,13 @@
 <h2><%= l(:label_psc_control_point_new) %></h2>
 <p><strong><%= l(:label_psc_category) %>:</strong> <%= @category.code %> - <%= @category.name %></p>
 
-<%= form_tag(psc_category_psc_control_points_path(@category)) do %>
+<%= form_tag(project_psc_category_psc_control_points_path(@project, @category)) do %>
   <div class="box tabular">
     <%= render partial: 'form' %>
   </div>
 
   <p>
     <%= submit_tag l(:button_create) %>
-    <%= link_to l(:button_cancel), psc_category_path(@category) %>
+    <%= link_to l(:button_cancel), project_psc_category_path(@project, @category) %>
   </p>
 <% end %>

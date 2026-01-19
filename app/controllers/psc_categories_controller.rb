@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class PscCategoriesController < ApplicationController
-  layout 'admin'
-
-  before_action :require_admin
+  before_action :find_project_by_project_id
+  before_action :authorize
   before_action :find_category, only: [:show, :edit, :update, :destroy]
 
   helper :sort
@@ -13,7 +12,7 @@ class PscCategoriesController < ApplicationController
     sort_init 'position', 'asc'
     sort_update %w[position name code]
 
-    @categories = PscControlCategory.sorted.includes(:control_points)
+    @categories = @project.psc_control_categories.sorted.includes(:control_points)
 
     respond_to do |format|
       format.html
@@ -22,20 +21,20 @@ class PscCategoriesController < ApplicationController
   end
 
   def show
-    @control_points = @category.control_points.sorted.includes(:tracker, :priority, :assigned_to)
+    @control_points = @category.control_points.sorted.includes(:tracker, :priority, :assigned_to, :owner)
   end
 
   def new
-    @category = PscControlCategory.new
+    @category = @project.psc_control_categories.build
   end
 
   def create
-    @category = PscControlCategory.new
+    @category = @project.psc_control_categories.build
     @category.safe_attributes = params[:psc_control_category]
 
     if @category.save
       flash[:notice] = l(:notice_successful_create)
-      redirect_to psc_categories_path
+      redirect_to project_psc_categories_path(@project)
     else
       render :new
     end
@@ -49,7 +48,7 @@ class PscCategoriesController < ApplicationController
 
     if @category.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_to psc_categories_path
+      redirect_to project_psc_categories_path(@project)
     else
       render :edit
     end
@@ -58,18 +57,18 @@ class PscCategoriesController < ApplicationController
   def destroy
     if @category.control_points.any?
       flash[:error] = l(:error_psc_category_has_control_points)
-      redirect_to psc_categories_path
+      redirect_to project_psc_categories_path(@project)
     else
       @category.destroy
       flash[:notice] = l(:notice_successful_delete)
-      redirect_to psc_categories_path
+      redirect_to project_psc_categories_path(@project)
     end
   end
 
   def import
     if params[:file].blank?
       flash[:error] = l(:error_no_file_selected)
-      redirect_to psc_categories_path
+      redirect_to project_psc_categories_path(@project)
       return
     end
 
@@ -80,15 +79,15 @@ class PscCategoriesController < ApplicationController
       flash[:error] = l(:error_psc_import_failed, message: e.message)
     end
 
-    redirect_to psc_categories_path
+    redirect_to project_psc_categories_path(@project)
   end
 
   def export
-    @categories = PscControlCategory.sorted.includes(control_points: [:tracker, :priority])
+    @categories = @project.psc_control_categories.sorted.includes(control_points: [:tracker, :priority])
 
     respond_to do |format|
       format.csv do
-        send_data export_to_csv, filename: "security_controls_#{Date.current.iso8601}.csv"
+        send_data export_to_csv, filename: "#{@project.identifier}_security_controls_#{Date.current.iso8601}.csv"
       end
     end
   end
@@ -96,7 +95,7 @@ class PscCategoriesController < ApplicationController
   private
 
   def find_category
-    @category = PscControlCategory.find(params[:id])
+    @category = @project.psc_control_categories.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render_404
   end
@@ -106,7 +105,7 @@ class PscCategoriesController < ApplicationController
     imported = 0
 
     CSV.foreach(file.path, headers: true) do |row|
-      category = PscControlCategory.find_or_initialize_by(code: row['code'].to_s.upcase)
+      category = @project.psc_control_categories.find_or_initialize_by(code: row['code'].to_s.upcase)
       category.name = row['name'] if row['name'].present?
       category.description = row['description']
       category.active = row['active'] != 'false'

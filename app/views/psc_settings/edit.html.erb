@@ -1,0 +1,70 @@
+<%= title l(:label_settings) %>
+
+<h2><%= l(:label_periodic_security_control) %> - <%= l(:label_settings) %></h2>
+
+<%= form_tag(project_psc_settings_path(@project), method: :patch) do %>
+  <div class="box tabular">
+    <h3><%= l(:label_psc_general_settings) %></h3>
+
+    <p>
+      <label><%= l(:setting_psc_advance_days) %></label>
+      <%= text_field_tag 'psc_setting[advance_days]', @settings.advance_days, size: 5 %>
+      <em class="info"><%= l(:text_psc_advance_days_help) %></em>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_enable_auto_generation) %></label>
+      <%= check_box_tag 'psc_setting[enable_auto_generation]', '1', @settings.enable_auto_generation %>
+      <%= hidden_field_tag 'psc_setting[enable_auto_generation]', '0', id: nil %>
+      <em class="info"><%= l(:text_psc_enable_auto_generation_help) %></em>
+    </p>
+
+    <h3><%= l(:label_psc_issue_templates) %></h3>
+
+    <p>
+      <label><%= l(:field_tracker) %></label>
+      <%= select_tag 'psc_setting[default_tracker_id]',
+                     options_from_collection_for_select(@trackers, :id, :name, @settings.default_tracker_id),
+                     include_blank: true %>
+      <em class="info"><%= l(:text_psc_tracker_help) %></em>
+    </p>
+
+    <p>
+      <label><%= l(:field_priority) %></label>
+      <%= select_tag 'psc_setting[default_priority_id]',
+                     options_from_collection_for_select(@priorities, :id, :name, @settings.default_priority_id),
+                     include_blank: true %>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_issue_subject_template) %></label>
+      <%= text_field_tag 'psc_setting[issue_subject_template]', @settings.issue_subject_template, size: 60 %>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_issue_description_template) %></label>
+      <%= text_area_tag 'psc_setting[issue_description_template]', @settings.issue_description_template, rows: 10, cols: 60 %>
+    </p>
+
+    <fieldset class="collapsible collapsed">
+      <legend onclick="toggleFieldset(this);"><%= l(:label_psc_available_variables) %></legend>
+      <div style="display: none;">
+        <ul>
+          <li><code>{{control_id}}</code> - <%= l(:text_psc_var_control_id) %></li>
+          <li><code>{{control_name}}</code> - <%= l(:text_psc_var_control_name) %></li>
+          <li><code>{{category}}</code> - <%= l(:text_psc_var_category) %></li>
+          <li><code>{{period}}</code> - <%= l(:text_psc_var_period) %></li>
+          <li><code>{{year}}</code> - <%= l(:text_psc_var_year) %></li>
+          <li><code>{{frequency}}</code> - <%= l(:text_psc_var_frequency) %></li>
+          <li><code>{{scheduled_date}}</code> - <%= l(:text_psc_var_scheduled_date) %></li>
+          <li><code>{{due_date}}</code> - <%= l(:text_psc_var_due_date) %></li>
+        </ul>
+      </div>
+    </fieldset>
+  </div>
+
+  <p>
+    <%= submit_tag l(:button_save) %>
+    <%= link_to l(:button_cancel), project_psc_control_points_path(@project) %>
+  </p>
+<% end %>

@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class PscControlPointsController < ApplicationController
-  layout 'admin'
-
-  before_action :require_admin
+  before_action :find_project_by_project_id
+  before_action :authorize
   before_action :find_category
   before_action :find_control_point, only: [:show, :edit, :update, :destroy, :generate_schedules]
 
@@ -14,14 +13,14 @@ class PscControlPointsController < ApplicationController
     sort_init 'position', 'asc'
     sort_update %w[position control_id name frequency]
 
-    @control_points = @category.control_points.sorted.includes(:tracker, :priority, :assigned_to)
+    @control_points = @category.control_points.sorted.includes(:tracker, :priority, :assigned_to, :owner)
   end
 
   def show
-    @schedules = @control_point.schedules
-                               .order(year: :desc, period_number: :desc)
-                               .page(params[:page])
-                               .per_page(25)
+    schedules_query = @control_point.schedules.order(year: :desc, period_number: :desc)
+    @schedule_count = schedules_query.count
+    @schedule_pages = Paginator.new @schedule_count, 25, params['page']
+    @schedules = schedules_query.limit(@schedule_pages.per_page).offset(@schedule_pages.offset)
   end
 
   def new
@@ -35,7 +34,7 @@ class PscControlPointsController < ApplicationController
 
     if @control_point.save
       flash[:notice] = l(:notice_successful_create)
-      redirect_to psc_category_path(@category)
+      redirect_to project_psc_category_path(@project, @category)
     else
       render :new
     end
@@ -49,7 +48,7 @@ class PscControlPointsController < ApplicationController
 
     if @control_point.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_to psc_category_path(@category)
+      redirect_to project_psc_category_path(@project, @category)
     else
       render :edit
     end
@@ -58,11 +57,11 @@ class PscControlPointsController < ApplicationController
   def destroy
     if @control_point.schedules.where.not(issue_id: nil).any?
       flash[:error] = l(:error_psc_control_point_has_issues)
-      redirect_to psc_category_path(@category)
+      redirect_to project_psc_category_path(@project, @category)
     else
       @control_point.destroy
       flash[:notice] = l(:notice_successful_delete)
-      redirect_to psc_category_path(@category)
+      redirect_to project_psc_category_path(@project, @category)
     end
   end
 
@@ -76,7 +75,7 @@ class PscControlPointsController < ApplicationController
       flash[:error] = l(:error_psc_schedules_generation_failed, message: e.message)
     end
 
-    redirect_to psc_category_psc_control_point_path(@category, @control_point)
+    redirect_to project_psc_category_psc_control_point_path(@project, @category, @control_point)
   end
 
   def bulk_generate_schedules
@@ -89,13 +88,13 @@ class PscControlPointsController < ApplicationController
     end
 
     flash[:notice] = l(:notice_psc_bulk_schedules_generated, count: generated_count, year: year)
-    redirect_to psc_category_path(@category)
+    redirect_to project_psc_category_path(@project, @category)
   end
 
   private
 
   def find_category
-    @category = PscControlCategory.find(params[:psc_category_id])
+    @category = @project.psc_control_categories.find(params[:psc_category_id])
   rescue ActiveRecord::RecordNotFound
     render_404
   end

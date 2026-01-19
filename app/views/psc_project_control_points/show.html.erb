@@ -1,8 +1,8 @@
 <%= title "#{@control_point.full_control_id} - #{@control_point.name}" %>
 
 <div class="contextual">
-  <%= link_to l(:button_edit), edit_project_psc_category_psc_control_point_path(@project, @category, @control_point), class: 'icon icon-edit' %>
-  <%= form_tag(generate_schedules_project_psc_category_psc_control_point_path(@project, @category, @control_point), method: :post, style: 'display: inline;') do %>
+  <%= link_to l(:button_edit), edit_project_psc_control_point_path(@project, @control_point), class: 'icon icon-edit' %>
+  <%= form_tag(generate_schedules_project_psc_control_point_path(@project, @control_point), method: :post, style: 'display: inline;') do %>
     <%= select_tag :year, options_for_select((Date.current.year - 1..Date.current.year + 2).to_a, Date.current.year) %>
     <%= submit_tag l(:label_psc_generate_schedules_short), class: 'small' %>
   <% end %>
@@ -16,13 +16,18 @@
     <p>
       <strong><%= l(:field_control_id) %>:</strong> <%= @control_point.full_control_id %><br>
       <strong><%= l(:field_name) %>:</strong> <%= @control_point.name %><br>
-      <strong><%= l(:label_psc_category) %>:</strong> <%= link_to @category.name, project_psc_category_path(@project, @category) %><br>
+      <strong><%= l(:label_psc_category) %>:</strong> <%= link_to "#{@category.code} - #{@category.name}", project_psc_category_path(@project, @category) %><br>
       <strong><%= l(:field_owner) %>:</strong> <%= @control_point.owner&.name || '-' %><br>
       <strong><%= l(:field_frequency) %>:</strong> <%= @control_point.frequency_label %><br>
       <strong><%= l(:field_tracker) %>:</strong> <%= @control_point.tracker&.name || '-' %><br>
       <strong><%= l(:field_priority) %>:</strong> <%= @control_point.priority&.name || '-' %><br>
       <strong><%= l(:field_assigned_to) %>:</strong> <%= @control_point.assigned_to&.name || '-' %><br>
-      <strong><%= l(:field_active) %>:</strong> <%= checked_image(@control_point.active) %><br>
+      <strong><%= l(:field_status) %>:</strong>
+      <% if @control_point.active %>
+        <span class="psc-status-active"><%= l(:status_active) %></span>
+      <% else %>
+        <span class="psc-status-inactive"><%= l(:status_inactive) %></span>
+      <% end %><br>
       <% if @control_point.description.present? %>
         <strong><%= l(:field_description) %>:</strong><br>
         <%= simple_format(@control_point.description) %>
@@ -85,7 +90,7 @@
           </td>
           <td class="buttons">
             <% if schedule.pending? %>
-              <%= link_to l(:label_psc_generate_issue), generate_issue_psc_schedule_path(schedule),
+              <%= link_to l(:label_psc_generate_issue), generate_issue_project_psc_schedule_path(@project, schedule),
                           method: :post, class: 'icon icon-add' %>
             <% end %>
           </td>
@@ -100,5 +105,5 @@
 <% end %>
 
 <p>
-  <%= link_to l(:button_back), project_psc_category_path(@project, @category) %>
+  <%= link_to l(:button_back), project_psc_control_points_path(@project) %>
 </p>

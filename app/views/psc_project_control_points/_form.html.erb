@@ -2,8 +2,15 @@
   <%= error_messages_for 'control_point' %>
 
   <p>
+    <%= f.select :category_id,
+                 @categories.map { |c| ["#{c.code} - #{c.name}", c.id] },
+                 { include_blank: true },
+                 required: true %>
+  </p>
+
+  <p>
     <%= f.text_field :control_id, size: 10, maxlength: 20, required: true %>
-    <em class="info"><%= l(:text_psc_control_id_format, prefix: @category.code) %></em>
+    <em class="info"><%= l(:text_psc_control_id_info) %></em>
   </p>
 
   <p>
@@ -45,10 +52,6 @@
     <%= f.select :assigned_to_id,
                  principals_options_for_select(@project.assignable_users),
                  include_blank: true %>
-  </p>
-
-  <p>
-    <%= f.text_field :position, size: 5 %>
   </p>
 
   <p>

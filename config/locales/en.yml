@@ -1,5 +1,6 @@
 en:
   # Plugin name
+  label_periodic_security_control: "Periodic Security Control"
   label_psc_dashboard: "Security Controls"
   label_psc_admin: "Security Controls"
   label_psc_schedules: "Control Schedules"
@@ -62,10 +63,13 @@ en:
   field_control_id: "Control ID"
   field_code: "Code"
   field_frequency: "Frequency"
+  field_owner: "Owner"
   field_scheduled_date: "Scheduled Date"
   field_due_date: "Due Date"
   field_period: "Period"
   field_year: "Year"
+  field_generated_at: "Generated At"
+  field_completed_at: "Completed At"
 
   # Statuses
   psc_status_pending: "Pending"
@@ -86,6 +90,7 @@ en:
 
   # Permissions
   permission_view_psc_dashboard: "View security control dashboard"
+  permission_view_psc_categories: "View control categories"
   permission_view_psc_schedules: "View control schedules"
   permission_manage_psc_schedules: "Manage control schedules"
   permission_manage_psc_categories: "Manage control categories"
@@ -132,7 +137,9 @@ en:
   # Code format
   text_psc_code_format: "2-5 uppercase letters (e.g., ACS, VSS)"
   text_psc_control_id_format: "Unique identifier (will be prefixed with %{prefix} if not already)"
+  text_psc_control_id_info: "Unique identifier within the category (e.g., 01, 02, A1)"
   text_psc_tracker_help: "Leave blank to use project default"
+  text_psc_owner_help: "Person responsible for this control point"
 
   # Confirmations
   text_psc_generate_schedules_confirm: "This will generate all schedules for this category. Continue?"

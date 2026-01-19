@@ -1,0 +1,14 @@
+<%= title l(:label_psc_control_point_edit) %>
+
+<h2><%= l(:label_psc_control_point_edit) %>: <%= @control_point.full_control_id %></h2>
+
+<%= form_tag(project_psc_control_point_path(@project, @control_point), method: :patch) do %>
+  <div class="box tabular">
+    <%= render partial: 'form' %>
+  </div>
+
+  <p>
+    <%= submit_tag l(:button_save) %>
+    <%= link_to l(:button_cancel), project_psc_control_point_path(@project, @control_point) %>
+  </p>
+<% end %>

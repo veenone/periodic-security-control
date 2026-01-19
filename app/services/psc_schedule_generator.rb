@@ -2,15 +2,9 @@
 
 class PscScheduleGenerator
   class << self
+    # Generate issues for all due schedules across all projects
     def generate_due_issues(options = {})
       settings = Setting.plugin_periodic_security_control
-      project_id = settings['default_project_id']
-
-      return { generated: 0, errors: ['No default project configured'] } if project_id.blank?
-
-      project = Project.find_by(id: project_id)
-      return { generated: 0, errors: ['Default project not found'] } unless project
-
       author_id = settings['issue_author_id']
       author = author_id.present? ? User.find_by(id: author_id) : User.current
       author ||= User.find_by(admin: true) || User.first
@@ -18,7 +12,46 @@ class PscScheduleGenerator
       generated_count = 0
       errors = []
 
-      PscSchedule.due_for_generation.includes(:control_point).find_each do |schedule|
+      PscSchedule.due_for_generation.includes(control_point: { category: :project }).find_each do |schedule|
+        project = schedule.control_point&.category&.project
+        next unless project
+
+        begin
+          issue = schedule.generate_issue!(project, author)
+          if issue.persisted?
+            generated_count += 1
+            Rails.logger.info "[PSC] Generated issue ##{issue.id} for schedule ##{schedule.id}"
+          else
+            error_msg = "Schedule ##{schedule.id}: #{issue.errors.full_messages.join(', ')}"
+            errors << error_msg
+            Rails.logger.error "[PSC] Failed to generate issue: #{error_msg}"
+          end
+        rescue StandardError => e
+          error_msg = "Schedule ##{schedule.id}: #{e.message}"
+          errors << error_msg
+          Rails.logger.error "[PSC] Exception generating issue: #{error_msg}"
+        end
+      end
+
+      { generated: generated_count, errors: errors }
+    end
+
+    # Generate issues for due schedules in a specific project
+    def generate_due_issues_for_project(project, options = {})
+      settings = Setting.plugin_periodic_security_control
+      author_id = settings['issue_author_id']
+      author = author_id.present? ? User.find_by(id: author_id) : User.current
+      author ||= User.find_by(admin: true) || User.first
+
+      generated_count = 0
+      errors = []
+
+      schedules = PscSchedule.due_for_generation
+                             .joins(control_point: :category)
+                             .where(psc_control_categories: { project_id: project.id })
+                             .includes(control_point: :category)
+
+      schedules.find_each do |schedule|
         begin
           issue = schedule.generate_issue!(project, author)
           if issue.persisted?
@@ -70,6 +103,12 @@ class PscScheduleGenerator
       { generated: generated_count, errors: errors }
     end
 
+    # Generate schedules for a specific project
+    def generate_year_schedules_for_project(project, year)
+      control_points = PscControlPoint.for_project(project).active
+      generate_year_schedules(year, control_points)
+    end
+
     def generate_all_schedules_for_year(year)
       categories = PscControlCategory.active.includes(:control_points)
       total_generated = 0
@@ -111,8 +150,13 @@ class PscScheduleGenerator
       count
     end
 
-    def statistics_for_year(year)
+    def statistics_for_year(year, project = nil)
       schedules = PscSchedule.for_year(year)
+
+      if project
+        schedules = schedules.joins(control_point: :category)
+                             .where(psc_control_categories: { project_id: project.id })
+      end
 
       {
         year: year,

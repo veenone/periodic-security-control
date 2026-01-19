@@ -15,14 +15,18 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   belongs_to :tracker, optional: true
   belongs_to :priority, class_name: 'IssuePriority', optional: true
   belongs_to :assigned_to, class_name: 'Principal', optional: true
+  belongs_to :owner, class_name: 'User', optional: true
 
   has_many :schedules, class_name: 'PscSchedule',
            foreign_key: 'control_point_id', dependent: :destroy
 
-  validates :control_id, presence: true, uniqueness: { case_sensitive: false }
+  has_one :project, through: :category
+
+  validates :control_id, presence: true
   validates :name, presence: true
   validates :frequency, presence: true, inclusion: { in: FREQUENCIES.keys }
   validates :category, presence: true
+  validate :control_id_unique_within_project
 
   before_validation :format_control_id
 
@@ -32,10 +36,13 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   scope :sorted, -> { order(:position) }
   scope :by_frequency, ->(freq) { where(frequency: freq) }
   scope :by_category, ->(category_id) { where(category_id: category_id) }
+  scope :for_project, ->(project) {
+    joins(:category).where(psc_control_categories: { project_id: project.is_a?(Project) ? project.id : project })
+  }
 
   safe_attributes 'category_id', 'control_id', 'name', 'description',
                   'frequency', 'position', 'active', 'tracker_id',
-                  'priority_id', 'assigned_to_id'
+                  'priority_id', 'assigned_to_id', 'owner_id'
 
   def to_s
     "#{full_control_id} - #{name}"
@@ -125,6 +132,17 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
 
   def format_control_id
     self.control_id = control_id.upcase.strip if control_id.present?
+  end
+
+  def control_id_unique_within_project
+    return unless control_id.present? && category.present? && category.project_id.present?
+
+    existing = PscControlPoint.joins(:category)
+                              .where(psc_control_categories: { project_id: category.project_id })
+                              .where('UPPER(psc_control_points.control_id) = ?', control_id.upcase)
+                              .where.not(id: id)
+
+    errors.add(:control_id, :taken) if existing.exists?
   end
 
   def calculate_next_date(from_date)

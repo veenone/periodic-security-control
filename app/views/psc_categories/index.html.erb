@@ -1,13 +1,13 @@
 <%= title l(:label_psc_categories) %>
 
 <div class="contextual">
-  <%= link_to l(:label_psc_category_new), new_psc_category_path, class: 'icon icon-add' %>
-  <%= link_to l(:label_psc_export), export_psc_categories_path(format: :csv), class: 'icon icon-download' %>
+  <%= link_to l(:label_psc_category_new), new_project_psc_category_path(@project), class: 'icon icon-add' %>
+  <%= link_to l(:label_psc_export), export_project_psc_categories_path(@project, format: :csv), class: 'icon icon-download' %>
 </div>
 
 <h2><%= l(:label_psc_categories) %></h2>
 
-<%= form_tag(import_psc_categories_path, multipart: true, class: 'psc-import-form') do %>
+<%= form_tag(import_project_psc_categories_path(@project), multipart: true, class: 'psc-import-form') do %>
   <fieldset class="collapsible collapsed">
     <legend onclick="toggleFieldset(this);"><%= l(:label_psc_import) %></legend>
     <div style="display: none;">
@@ -38,20 +38,20 @@
           <td class="position"><%= category.position %></td>
           <td class="code"><strong><%= category.code %></strong></td>
           <td class="name">
-            <%= link_to category.name, psc_category_path(category) %>
+            <%= link_to category.name, project_psc_category_path(@project, category) %>
             <% if category.description.present? %>
               <br><span class="description"><%= truncate(category.description, length: 100) %></span>
             <% end %>
           </td>
           <td class="control-points-count">
-            <%= link_to category.control_points.active.count, psc_category_path(category) %>
+            <%= link_to category.control_points.active.count, project_psc_category_path(@project, category) %>
           </td>
           <td class="active">
             <%= checked_image(category.active) %>
           </td>
           <td class="buttons">
-            <%= link_to l(:button_edit), edit_psc_category_path(category), class: 'icon icon-edit' %>
-            <%= link_to l(:button_delete), psc_category_path(category),
+            <%= link_to l(:button_edit), edit_project_psc_category_path(@project, category), class: 'icon icon-edit' %>
+            <%= link_to l(:button_delete), project_psc_category_path(@project, category),
                         method: :delete,
                         data: { confirm: l(:text_are_you_sure) },
                         class: 'icon icon-del' %>

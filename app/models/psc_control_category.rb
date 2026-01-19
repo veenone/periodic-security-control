@@ -3,22 +3,25 @@
 class PscControlCategory < (defined?(ApplicationRecord) == 'constant' ? ApplicationRecord : ActiveRecord::Base)
   include Redmine::SafeAttributes
 
+  belongs_to :project
   has_many :control_points, class_name: 'PscControlPoint',
            foreign_key: 'category_id', dependent: :destroy
 
-  validates :name, presence: true, uniqueness: { case_sensitive: false }
-  validates :code, presence: true, uniqueness: { case_sensitive: false },
+  validates :name, presence: true, uniqueness: { scope: :project_id, case_sensitive: false }
+  validates :code, presence: true, uniqueness: { scope: :project_id, case_sensitive: false },
             length: { minimum: 2, maximum: 5 },
             format: { with: /\A[A-Z]+\z/, message: :invalid_code_format }
+  validates :project, presence: true
 
   before_validation :upcase_code
 
-  acts_as_positioned
+  acts_as_positioned scope: [:project_id]
 
   scope :active, -> { where(active: true) }
   scope :sorted, -> { order(:position) }
+  scope :for_project, ->(project) { where(project_id: project.is_a?(Project) ? project.id : project) }
 
-  safe_attributes 'name', 'code', 'description', 'position', 'active'
+  safe_attributes 'name', 'code', 'description', 'position', 'active', 'project_id'
 
   def to_s
     name

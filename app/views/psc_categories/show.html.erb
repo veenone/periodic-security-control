@@ -1,9 +1,9 @@
 <%= title "#{@category.code} - #{@category.name}" %>
 
 <div class="contextual">
-  <%= link_to l(:button_edit), edit_psc_category_path(@category), class: 'icon icon-edit' %>
-  <%= link_to l(:label_psc_control_point_new), new_psc_category_psc_control_point_path(@category), class: 'icon icon-add' %>
-  <%= form_tag(bulk_generate_schedules_psc_category_psc_control_points_path(@category), method: :post, style: 'display: inline;') do %>
+  <%= link_to l(:button_edit), edit_project_psc_category_path(@project, @category), class: 'icon icon-edit' %>
+  <%= link_to l(:label_psc_control_point_new), new_project_psc_category_psc_control_point_path(@project, @category), class: 'icon icon-add' %>
+  <%= form_tag(bulk_generate_schedules_project_psc_category_psc_control_points_path(@project, @category), method: :post, style: 'display: inline;') do %>
     <%= hidden_field_tag :year, Date.current.year %>
     <%= submit_tag l(:label_psc_generate_schedules, year: Date.current.year), class: 'icon icon-reload', data: { confirm: l(:text_psc_generate_schedules_confirm) } %>
   <% end %>
@@ -48,8 +48,8 @@
       <tr>
         <th><%= l(:field_control_id) %></th>
         <th><%= l(:field_name) %></th>
+        <th><%= l(:field_owner) %></th>
         <th><%= l(:field_frequency) %></th>
-        <th><%= l(:field_tracker) %></th>
         <th><%= l(:field_assigned_to) %></th>
         <th><%= l(:field_active) %></th>
         <th></th>
@@ -60,15 +60,15 @@
         <tr class="<%= cycle('odd', 'even') %> <%= 'inactive' unless cp.active %>">
           <td class="control-id"><strong><%= cp.full_control_id %></strong></td>
           <td class="name">
-            <%= link_to cp.name, psc_category_psc_control_point_path(@category, cp) %>
+            <%= link_to cp.name, project_psc_category_psc_control_point_path(@project, @category, cp) %>
           </td>
+          <td class="owner"><%= cp.owner&.name || '-' %></td>
           <td class="frequency"><%= cp.frequency_label %></td>
-          <td class="tracker"><%= cp.tracker&.name || '-' %></td>
           <td class="assigned-to"><%= cp.assigned_to&.name || '-' %></td>
           <td class="active"><%= checked_image(cp.active) %></td>
           <td class="buttons">
-            <%= link_to l(:button_edit), edit_psc_category_psc_control_point_path(@category, cp), class: 'icon icon-edit' %>
-            <%= link_to l(:button_delete), psc_category_psc_control_point_path(@category, cp),
+            <%= link_to l(:button_edit), edit_project_psc_category_psc_control_point_path(@project, @category, cp), class: 'icon icon-edit' %>
+            <%= link_to l(:button_delete), project_psc_category_psc_control_point_path(@project, @category, cp),
                         method: :delete,
                         data: { confirm: l(:text_are_you_sure) },
                         class: 'icon icon-del' %>
@@ -82,5 +82,5 @@
 <% end %>
 
 <p>
-  <%= link_to l(:button_back), psc_categories_path %>
+  <%= link_to l(:button_back), project_psc_categories_path(@project) %>
 </p>

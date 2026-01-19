@@ -1,0 +1,82 @@
+<%= title l(:label_psc_control_points) %>
+
+<div class="contextual">
+  <%= link_to l(:label_psc_control_point_new), new_project_psc_control_point_path(@project), class: 'icon icon-add' %>
+</div>
+
+<h2><%= l(:label_psc_control_points) %></h2>
+
+<%= form_tag(project_psc_control_points_path(@project), method: :get, class: 'psc-filter-form') do %>
+  <fieldset>
+    <legend><%= l(:label_filter) %></legend>
+    <p>
+      <label><%= l(:label_psc_category) %>:</label>
+      <%= select_tag :category_id, options_for_select([['', '']] + @categories.map { |c| ["#{c.code} - #{c.name}", c.id] }, @category_filter) %>
+
+      <label><%= l(:field_frequency) %>:</label>
+      <%= select_tag :frequency, options_for_select([['', '']] + PscControlPoint::FREQUENCIES.map { |k, v| [v[:label], k] }, @frequency_filter) %>
+
+      <label><%= l(:field_status) %>:</label>
+      <%= select_tag :status, options_for_select([['', ''], [l(:status_active), 'active'], [l(:status_inactive), 'inactive']], @status_filter) %>
+
+      <%= submit_tag l(:button_apply), name: nil %>
+      <%= link_to l(:button_clear), project_psc_control_points_path(@project) %>
+    </p>
+  </fieldset>
+<% end %>
+
+<% if @control_points.any? %>
+  <table class="list psc-control-points-table">
+    <thead>
+      <tr>
+        <th><%= sort_header_tag('control_id', caption: l(:field_control_id)) %></th>
+        <th><%= sort_header_tag('name', caption: l(:field_name)) %></th>
+        <th><%= l(:label_psc_category) %></th>
+        <th><%= l(:field_owner) %></th>
+        <th><%= sort_header_tag('frequency', caption: l(:field_frequency)) %></th>
+        <th><%= l(:field_assigned_to) %></th>
+        <th><%= sort_header_tag('active', caption: l(:field_status)) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @control_points.each do |cp| %>
+        <tr class="<%= cycle('odd', 'even') %> <%= 'inactive' unless cp.active %>">
+          <td class="control-id">
+            <strong><%= link_to cp.full_control_id, project_psc_control_point_path(@project, cp) %></strong>
+          </td>
+          <td class="name">
+            <%= link_to cp.name, project_psc_control_point_path(@project, cp) %>
+            <% if cp.description.present? %>
+              <br><span class="description"><%= truncate(cp.description, length: 60) %></span>
+            <% end %>
+          </td>
+          <td class="category">
+            <%= link_to cp.category.code, project_psc_category_path(@project, cp.category) %>
+          </td>
+          <td class="owner"><%= cp.owner&.name || '-' %></td>
+          <td class="frequency"><%= cp.frequency_label %></td>
+          <td class="assigned-to"><%= cp.assigned_to&.name || '-' %></td>
+          <td class="status">
+            <% if cp.active %>
+              <span class="psc-status-active"><%= l(:status_active) %></span>
+            <% else %>
+              <span class="psc-status-inactive"><%= l(:status_inactive) %></span>
+            <% end %>
+          </td>
+          <td class="buttons">
+            <%= link_to l(:button_edit), edit_project_psc_control_point_path(@project, cp), class: 'icon icon-edit' %>
+            <%= link_to l(:button_delete), project_psc_control_point_path(@project, cp),
+                        method: :delete,
+                        data: { confirm: l(:text_are_you_sure) },
+                        class: 'icon icon-del' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="pagination"><%= pagination_links_full @control_point_pages, @control_point_count %></p>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

@@ -1,0 +1,64 @@
+<%= title "#{@schedule.control_point.full_control_id} - #{@schedule.period_label} #{@schedule.year}" %>
+
+<div class="contextual">
+  <% if @schedule.pending? %>
+    <%= link_to l(:label_psc_generate_issue), generate_issue_psc_schedule_path(@schedule),
+                method: :post, class: 'icon icon-add' %>
+    <%= link_to l(:button_skip), skip_psc_schedule_path(@schedule),
+                method: :post, class: 'icon icon-cancel' %>
+  <% elsif @schedule.generated? %>
+    <%= link_to l(:button_complete), complete_psc_schedule_path(@schedule),
+                method: :post, class: 'icon icon-checked' %>
+  <% elsif @schedule.completed? || @schedule.skipped? %>
+    <%= link_to l(:button_reopen), reopen_psc_schedule_path(@schedule),
+                method: :post, class: 'icon icon-reload' %>
+  <% end %>
+</div>
+
+<h2><%= @schedule.control_point.full_control_id %> - <%= @schedule.period_label %> <%= @schedule.year %></h2>
+
+<div class="splitcontentleft">
+  <fieldset class="box">
+    <legend><%= l(:label_psc_schedule) %></legend>
+    <p>
+      <strong><%= l(:label_psc_category) %>:</strong> <%= @schedule.control_point.category.name %><br>
+      <strong><%= l(:field_control_id) %>:</strong> <%= @schedule.control_point.full_control_id %><br>
+      <strong><%= l(:field_name) %>:</strong> <%= @schedule.control_point.name %><br>
+      <strong><%= l(:field_frequency) %>:</strong> <%= @schedule.control_point.frequency_label %><br>
+      <strong><%= l(:field_period) %>:</strong> <%= @schedule.period_label %> <%= @schedule.year %><br>
+      <strong><%= l(:field_scheduled_date) %>:</strong> <%= format_date(@schedule.scheduled_date) %><br>
+      <strong><%= l(:field_due_date) %>:</strong> <%= format_date(@schedule.due_date) %><br>
+      <strong><%= l(:field_status) %>:</strong>
+      <span class="psc-status <%= @schedule.status_css_class %>">
+        <%= l("psc_status_#{@schedule.status}") %>
+      </span>
+    </p>
+  </fieldset>
+</div>
+
+<div class="splitcontentright">
+  <fieldset class="box">
+    <legend><%= l(:label_information) %></legend>
+    <p>
+      <% if @schedule.issue %>
+        <strong><%= l(:field_issue) %>:</strong> <%= link_to "##{@schedule.issue.id} - #{@schedule.issue.subject}", issue_path(@schedule.issue) %><br>
+      <% end %>
+      <% if @schedule.generated_at %>
+        <strong><%= l(:field_generated_at) %>:</strong> <%= format_time(@schedule.generated_at) %><br>
+      <% end %>
+      <% if @schedule.completed_at %>
+        <strong><%= l(:field_completed_at) %>:</strong> <%= format_time(@schedule.completed_at) %><br>
+      <% end %>
+      <% if @schedule.notes.present? %>
+        <strong><%= l(:field_notes) %>:</strong><br>
+        <%= simple_format(@schedule.notes) %>
+      <% end %>
+    </p>
+  </fieldset>
+</div>
+
+<div style="clear: both;"></div>
+
+<p>
+  <%= link_to l(:button_back), psc_schedules_path %>
+</p>

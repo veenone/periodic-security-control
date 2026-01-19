@@ -10,9 +10,9 @@ class CreatePscControlPoints < ActiveRecord::Migration[5.2]
       t.string :frequency, null: false, default: 'monthly'
       t.integer :position, default: 1
       t.boolean :active, default: true, null: false
-      t.references :tracker, foreign_key: true
-      t.references :priority, foreign_key: { to_table: :enumerations }
-      t.references :assigned_to, foreign_key: { to_table: :users }
+      t.references :tracker, type: :integer, foreign_key: true
+      t.references :priority, type: :integer, foreign_key: { to_table: :enumerations }
+      t.references :assigned_to, type: :integer, foreign_key: { to_table: :users }
       t.timestamps null: false
     end
 
