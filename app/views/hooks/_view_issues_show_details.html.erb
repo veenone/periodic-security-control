@@ -1,6 +1,7 @@
 <% if @issue.psc_linked? %>
   <% schedule = @issue.psc_schedule %>
   <% control_point = schedule.control_point %>
+  <% project = control_point.category.project %>
 
   <hr>
   <p>
@@ -9,7 +10,7 @@
   <table class="attributes psc-issue-details">
     <tr>
       <th><%= l(:field_control_id) %>:</th>
-      <td><%= link_to control_point.full_control_id, psc_category_psc_control_point_path(control_point.category, control_point) %></td>
+      <td><%= link_to control_point.full_control_id, project_psc_control_point_path(project, control_point) %></td>
     </tr>
     <tr>
       <th><%= l(:field_name) %>:</th>
@@ -17,7 +18,7 @@
     </tr>
     <tr>
       <th><%= l(:label_psc_category) %>:</th>
-      <td><%= link_to control_point.category.name, psc_category_path(control_point.category) %></td>
+      <td><%= link_to control_point.category.name, project_psc_category_path(project, control_point.category) %></td>
     </tr>
     <tr>
       <th><%= l(:field_frequency) %>:</th>
