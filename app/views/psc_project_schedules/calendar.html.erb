@@ -4,61 +4,88 @@
   <%= link_to l(:label_psc_schedules), project_psc_schedules_path(@project, year: @year), class: 'icon icon-list' %>
 </div>
 
-<h2><%= l(:label_psc_calendar) %></h2>
-
-<div class="psc-calendar-nav">
-  <%
-    prev_month = @month == 1 ? 12 : @month - 1
-    prev_year = @month == 1 ? @year - 1 : @year
-    next_month = @month == 12 ? 1 : @month + 1
-    next_year = @month == 12 ? @year + 1 : @year
-  %>
-  <%= link_to '« ' + l(:label_previous), calendar_project_psc_schedules_path(@project, year: prev_year, month: prev_month), class: 'psc-nav-link' %>
-  <span class="psc-current-month"><%= Date::MONTHNAMES[@month] %> <%= @year %></span>
-  <%= link_to l(:label_next) + ' »', calendar_project_psc_schedules_path(@project, year: next_year, month: next_month), class: 'psc-nav-link' %>
-</div>
-
-<table class="psc-calendar">
-  <thead>
-    <tr>
-      <% Date::DAYNAMES.each do |day| %>
-        <th><%= day[0..2] %></th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
+<div class="psc-calendar-container">
+  <div class="psc-calendar-nav">
     <%
-      start_date = Date.new(@year, @month, 1)
-      end_date = start_date.end_of_month
-      current_date = start_date.beginning_of_week(:sunday)
+      prev_month = @month == 1 ? 12 : @month - 1
+      prev_year = @month == 1 ? @year - 1 : @year
+      next_month = @month == 12 ? 1 : @month + 1
+      next_year = @month == 12 ? @year + 1 : @year
     %>
-    <% while current_date <= end_date.end_of_week(:sunday) %>
+    <%= link_to calendar_project_psc_schedules_path(@project, year: prev_year, month: prev_month), class: 'psc-nav-btn' do %>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span><%= l(:label_previous) %></span>
+    <% end %>
+    <span class="psc-current-month"><%= Date::MONTHNAMES[@month] %> <%= @year %></span>
+    <%= link_to calendar_project_psc_schedules_path(@project, year: next_year, month: next_month), class: 'psc-nav-btn' do %>
+      <span><%= l(:label_next) %></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    <% end %>
+  </div>
+
+  <table class="psc-calendar">
+    <thead>
       <tr>
-        <% 7.times do %>
-          <td class="<%= 'other-month' if current_date.month != @month %> <%= 'today' if current_date == Date.current %>">
-            <div class="psc-day-number"><%= current_date.day %></div>
-            <% if @schedules_by_date[current_date] %>
-              <div class="psc-day-schedules">
-                <% @schedules_by_date[current_date].each do |schedule| %>
-                  <div class="psc-schedule-item <%= schedule.status_css_class %>"
-                       title="<%= schedule.control_point.full_control_id %> - <%= schedule.control_point.name %>">
-                    <span class="psc-schedule-id"><%= schedule.control_point.full_control_id %></span>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-          </td>
-          <% current_date += 1.day %>
+        <% Date::DAYNAMES.each do |day| %>
+          <th><%= day[0..2] %></th>
         <% end %>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <%
+        start_date = Date.new(@year, @month, 1)
+        end_date = start_date.end_of_month
+        current_date = start_date.beginning_of_week(:sunday)
+      %>
+      <% while current_date <= end_date.end_of_week(:sunday) %>
+        <tr>
+          <% 7.times do %>
+            <td class="psc-calendar-cell <%= 'other-month' if current_date.month != @month %> <%= 'today' if current_date == Date.current %>">
+              <div class="psc-day-header">
+                <span class="psc-day-number"><%= current_date.day %></span>
+              </div>
+              <% if @schedules_by_date[current_date] %>
+                <div class="psc-day-schedules">
+                  <% @schedules_by_date[current_date].each do |schedule| %>
+                    <div class="psc-schedule-item <%= schedule.status_css_class %>"
+                         title="<%= schedule.control_point.full_control_id %> - <%= schedule.control_point.name %>">
+                      <span class="psc-schedule-id"><%= schedule.control_point.full_control_id %></span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </td>
+            <% current_date += 1.day %>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 
-<div class="psc-calendar-legend">
-  <span class="psc-legend-item psc-status-pending"><%= l(:psc_status_pending) %></span>
-  <span class="psc-legend-item psc-status-generated"><%= l(:psc_status_generated) %></span>
-  <span class="psc-legend-item psc-status-completed"><%= l(:psc_status_completed) %></span>
-  <span class="psc-legend-item psc-status-overdue"><%= l(:psc_status_overdue) %></span>
-  <span class="psc-legend-item psc-status-skipped"><%= l(:psc_status_skipped) %></span>
+  <div class="psc-calendar-legend">
+    <div class="psc-legend-item">
+      <span class="psc-legend-badge psc-status-pending"></span>
+      <span><%= l(:psc_status_pending) %></span>
+    </div>
+    <div class="psc-legend-item">
+      <span class="psc-legend-badge psc-status-generated"></span>
+      <span><%= l(:psc_status_generated) %></span>
+    </div>
+    <div class="psc-legend-item">
+      <span class="psc-legend-badge psc-status-completed"></span>
+      <span><%= l(:psc_status_completed) %></span>
+    </div>
+    <div class="psc-legend-item">
+      <span class="psc-legend-badge psc-status-overdue"></span>
+      <span><%= l(:psc_status_overdue) %></span>
+    </div>
+    <div class="psc-legend-item">
+      <span class="psc-legend-badge psc-status-skipped"></span>
+      <span><%= l(:psc_status_skipped) %></span>
+    </div>
+  </div>
 </div>

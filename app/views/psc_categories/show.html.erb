@@ -9,78 +9,133 @@
   <% end %>
 </div>
 
-<h2><%= @category.code %> - <%= @category.name %></h2>
-
-<div class="splitcontentleft">
-  <fieldset class="box">
-    <legend><%= l(:label_information) %></legend>
-    <p>
-      <strong><%= l(:field_code) %>:</strong> <%= @category.code %><br>
-      <strong><%= l(:field_name) %>:</strong> <%= @category.name %><br>
-      <strong><%= l(:field_active) %>:</strong> <%= checked_image(@category.active) %><br>
+<div class="psc-detail-grid">
+  <div class="psc-detail-card">
+    <div class="psc-detail-card-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <h4><%= l(:label_information) %></h4>
+    </div>
+    <div class="psc-detail-card-content">
+      <div class="psc-detail-row">
+        <span class="psc-detail-label"><%= l(:field_code) %></span>
+        <span class="psc-detail-value"><span class="psc-code-badge"><%= @category.code %></span></span>
+      </div>
+      <div class="psc-detail-row">
+        <span class="psc-detail-label"><%= l(:field_name) %></span>
+        <span class="psc-detail-value"><%= @category.name %></span>
+      </div>
+      <div class="psc-detail-row">
+        <span class="psc-detail-label"><%= l(:field_active) %></span>
+        <span class="psc-detail-value">
+          <% if @category.active %>
+            <span class="psc-badge psc-badge-success"><%= l(:status_active) %></span>
+          <% else %>
+            <span class="psc-badge psc-badge-secondary"><%= l(:status_inactive) %></span>
+          <% end %>
+        </span>
+      </div>
       <% if @category.description.present? %>
-        <strong><%= l(:field_description) %>:</strong><br>
-        <%= simple_format(@category.description) %>
+        <div class="psc-detail-row psc-detail-full">
+          <span class="psc-detail-label"><%= l(:field_description) %></span>
+          <div class="psc-detail-value psc-description-text"><%= simple_format(@category.description) %></div>
+        </div>
       <% end %>
-    </p>
-  </fieldset>
+    </div>
+  </div>
+
+  <div class="psc-detail-card">
+    <div class="psc-detail-card-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <h4><%= l(:label_statistics) %></h4>
+    </div>
+    <div class="psc-detail-card-content">
+      <div class="psc-stats-grid">
+        <div class="psc-stat-item">
+          <div class="psc-stat-value"><%= @category.control_points.active.count %></div>
+          <div class="psc-stat-label"><%= l(:label_psc_control_points_count) %></div>
+        </div>
+        <div class="psc-stat-item">
+          <div class="psc-stat-value"><%= @category.total_schedules_count %></div>
+          <div class="psc-stat-label"><%= l(:label_psc_total_schedules) %> (<%= Date.current.year %>)</div>
+        </div>
+        <div class="psc-stat-item psc-stat-success">
+          <div class="psc-stat-value"><%= @category.completed_schedules_count %></div>
+          <div class="psc-stat-label"><%= l(:label_psc_completed) %></div>
+        </div>
+        <div class="psc-stat-item psc-stat-primary">
+          <div class="psc-stat-value"><%= @category.completion_rate %>%</div>
+          <div class="psc-stat-label"><%= l(:label_psc_completion_rate) %></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="splitcontentright">
-  <fieldset class="box">
-    <legend><%= l(:label_statistics) %></legend>
-    <p>
-      <strong><%= l(:label_psc_control_points_count) %>:</strong> <%= @category.control_points.active.count %><br>
-      <strong><%= l(:label_psc_total_schedules) %> (<%= Date.current.year %>):</strong> <%= @category.total_schedules_count %><br>
-      <strong><%= l(:label_psc_completed) %>:</strong> <%= @category.completed_schedules_count %><br>
-      <strong><%= l(:label_psc_completion_rate) %>:</strong> <%= @category.completion_rate %>%
-    </p>
-  </fieldset>
-</div>
-
-<div style="clear: both;"></div>
-
-<h3><%= l(:label_psc_control_points) %></h3>
-
-<% if @control_points.any? %>
-  <table class="list psc-control-points-table">
-    <thead>
-      <tr>
-        <th><%= l(:field_control_id) %></th>
-        <th><%= l(:field_name) %></th>
-        <th><%= l(:field_owner) %></th>
-        <th><%= l(:field_frequency) %></th>
-        <th><%= l(:field_assigned_to) %></th>
-        <th><%= l(:field_active) %></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @control_points.each do |cp| %>
-        <tr class="<%= cycle('odd', 'even') %> <%= 'inactive' unless cp.active %>">
-          <td class="control-id"><strong><%= cp.full_control_id %></strong></td>
-          <td class="name">
-            <%= link_to cp.name, project_psc_category_psc_control_point_path(@project, @category, cp) %>
-          </td>
-          <td class="owner"><%= cp.owner&.name || '-' %></td>
-          <td class="frequency"><%= cp.frequency_label %></td>
-          <td class="assigned-to"><%= cp.assigned_to&.name || '-' %></td>
-          <td class="active"><%= checked_image(cp.active) %></td>
-          <td class="buttons">
-            <%= link_to l(:button_edit), edit_project_psc_category_psc_control_point_path(@project, @category, cp), class: 'icon icon-edit' %>
-            <%= link_to l(:button_delete), project_psc_category_psc_control_point_path(@project, @category, cp),
-                        method: :delete,
-                        data: { confirm: l(:text_are_you_sure) },
-                        class: 'icon icon-del' %>
-          </td>
+<div class="psc-section">
+  <div class="psc-section-header">
+    <h3 class="psc-section-title"><%= l(:label_psc_control_points) %></h3>
+  </div>
+  <% if @control_points.any? %>
+    <table class="psc-table">
+      <thead>
+        <tr>
+          <th><%= l(:field_control_id) %></th>
+          <th><%= l(:field_name) %></th>
+          <th><%= l(:field_owner) %></th>
+          <th><%= l(:field_frequency) %></th>
+          <th><%= l(:field_assigned_to) %></th>
+          <th class="text-center"><%= l(:field_active) %></th>
+          <th><%= l(:label_actions) %></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
-<% end %>
+      </thead>
+      <tbody>
+        <% @control_points.each do |cp| %>
+          <tr class="<%= 'inactive' unless cp.active %>">
+            <td>
+              <span class="psc-control-id"><%= cp.full_control_id %></span>
+            </td>
+            <td>
+              <%= link_to cp.name, project_psc_category_psc_control_point_path(@project, @category, cp), class: 'psc-link-primary' %>
+            </td>
+            <td><%= cp.owner&.name || '-' %></td>
+            <td>
+              <span class="psc-frequency-badge psc-frequency-<%= cp.frequency %>"><%= cp.frequency_label %></span>
+            </td>
+            <td><%= cp.assigned_to&.name || '-' %></td>
+            <td class="text-center">
+              <% if cp.active %>
+                <span class="psc-badge psc-badge-success"><%= l(:status_active) %></span>
+              <% else %>
+                <span class="psc-badge psc-badge-secondary"><%= l(:status_inactive) %></span>
+              <% end %>
+            </td>
+            <td class="psc-actions">
+              <%= link_to l(:button_edit), edit_project_psc_category_psc_control_point_path(@project, @category, cp), class: 'icon icon-edit' %>
+              <%= link_to l(:button_delete), project_psc_category_psc_control_point_path(@project, @category, cp),
+                          method: :delete,
+                          data: { confirm: l(:text_are_you_sure) },
+                          class: 'icon icon-del' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="psc-empty-state psc-empty-state-small">
+      <p><%= l(:label_no_data) %></p>
+      <%= link_to l(:label_psc_control_point_new), new_project_psc_category_psc_control_point_path(@project, @category), class: 'psc-btn psc-btn-primary' %>
+    </div>
+  <% end %>
+</div>
 
-<p>
-  <%= link_to l(:button_back), project_psc_categories_path(@project) %>
-</p>
+<div class="psc-form-actions">
+  <%= link_to l(:button_back), project_psc_categories_path(@project), class: 'psc-btn psc-btn-secondary' %>
+</div>

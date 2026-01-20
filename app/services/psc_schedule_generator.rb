@@ -150,6 +150,19 @@ class PscScheduleGenerator
       count
     end
 
+    def reset_schedules_with_missing_issues
+      # Reset schedules where the linked issue has been deleted
+      reset_count = 0
+
+      PscSchedule.with_missing_issues.find_each do |schedule|
+        schedule.reset_orphaned!
+        reset_count += 1
+      end
+
+      Rails.logger.info "[PSC] Reset #{reset_count} schedules with missing issues"
+      reset_count
+    end
+
     def statistics_for_year(year, project = nil)
       schedules = PscSchedule.for_year(year)
 

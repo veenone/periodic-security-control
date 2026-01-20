@@ -1,121 +1,194 @@
-<%= title l(:label_settings) %>
+<%= title "#{l(:label_periodic_security_control)} - #{l(:label_settings)}" %>
 
-<h2><%= l(:label_periodic_security_control) %> - <%= l(:label_settings) %></h2>
-
-<%= form_tag(project_psc_settings_path(@project), method: :patch) do %>
-  <div class="box tabular">
-    <h3><%= l(:label_psc_general_settings) %></h3>
-
-    <p>
-      <label><%= l(:setting_psc_advance_days) %></label>
-      <%= text_field_tag 'psc_setting[advance_days]', @settings.advance_days, size: 5 %>
-      <em class="info"><%= l(:text_psc_advance_days_help) %></em>
-    </p>
-
-    <p>
-      <label><%= l(:setting_psc_enable_auto_generation) %></label>
-      <%= check_box_tag 'psc_setting[enable_auto_generation]', '1', @settings.enable_auto_generation %>
-      <%= hidden_field_tag 'psc_setting[enable_auto_generation]', '0', id: nil %>
-      <em class="info"><%= l(:text_psc_enable_auto_generation_help) %></em>
-    </p>
-
-    <h3><%= l(:label_psc_issue_templates) %></h3>
-
-    <p>
-      <label><%= l(:field_tracker) %></label>
-      <%= select_tag 'psc_setting[default_tracker_id]',
-                     options_from_collection_for_select(@trackers, :id, :name, @settings.default_tracker_id),
-                     include_blank: true %>
-      <em class="info"><%= l(:text_psc_tracker_help) %></em>
-    </p>
-
-    <p>
-      <label><%= l(:field_priority) %></label>
-      <%= select_tag 'psc_setting[default_priority_id]',
-                     options_from_collection_for_select(@priorities, :id, :name, @settings.default_priority_id),
-                     include_blank: true %>
-    </p>
-
-    <p>
-      <label><%= l(:field_status) %></label>
-      <%= select_tag 'psc_setting[default_status_id]',
-                     options_from_collection_for_select(@statuses, :id, :name, @settings.default_status_id),
-                     include_blank: true %>
-      <em class="info"><%= l(:text_psc_default_status_help) %></em>
-    </p>
-
-    <p>
-      <label><%= l(:setting_psc_issue_subject_template) %></label>
-      <%= text_field_tag 'psc_setting[issue_subject_template]', @settings.issue_subject_template, size: 60 %>
-    </p>
-
-    <p>
-      <label><%= l(:setting_psc_issue_description_template) %></label>
-      <%= text_area_tag 'psc_setting[issue_description_template]', @settings.issue_description_template, rows: 10, cols: 60 %>
-    </p>
-
-    <fieldset class="collapsible collapsed">
-      <legend onclick="toggleFieldset(this);"><%= l(:label_psc_available_variables) %></legend>
-      <div style="display: none;">
-        <ul>
-          <li><code>{{control_id}}</code> - <%= l(:text_psc_var_control_id) %></li>
-          <li><code>{{control_name}}</code> - <%= l(:text_psc_var_control_name) %></li>
-          <li><code>{{category}}</code> - <%= l(:text_psc_var_category) %></li>
-          <li><code>{{period}}</code> - <%= l(:text_psc_var_period) %></li>
-          <li><code>{{year}}</code> - <%= l(:text_psc_var_year) %></li>
-          <li><code>{{frequency}}</code> - <%= l(:text_psc_var_frequency) %></li>
-          <li><code>{{scheduled_date}}</code> - <%= l(:text_psc_var_scheduled_date) %></li>
-          <li><code>{{due_date}}</code> - <%= l(:text_psc_var_due_date) %></li>
-        </ul>
+<%= form_tag(project_psc_settings_path(@project), method: :patch, class: 'psc-settings-form') do %>
+  <div class="psc-settings-container">
+    <!-- General Settings Section -->
+    <div class="psc-settings-section">
+      <div class="psc-settings-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        <h3><%= l(:label_psc_general_settings) %></h3>
       </div>
-    </fieldset>
+      <div class="psc-settings-content">
+        <div class="psc-form-group">
+          <label class="psc-form-label"><%= l(:setting_psc_advance_days) %></label>
+          <div class="psc-form-input-wrapper">
+            <%= text_field_tag 'psc_setting[advance_days]', @settings.advance_days, size: 5, class: 'psc-form-input psc-input-small' %>
+            <span class="psc-input-suffix"><%= l(:label_days) %></span>
+          </div>
+          <p class="psc-form-hint"><%= l(:text_psc_advance_days_help) %></p>
+        </div>
 
-    <h3><%= l(:label_psc_schedule_configuration) %></h3>
+        <div class="psc-form-group">
+          <label class="psc-form-label psc-checkbox-label">
+            <%= check_box_tag 'psc_setting[enable_auto_generation]', '1', @settings.enable_auto_generation, class: 'psc-checkbox' %>
+            <%= hidden_field_tag 'psc_setting[enable_auto_generation]', '0', id: nil %>
+            <%= l(:setting_psc_enable_auto_generation) %>
+          </label>
+          <p class="psc-form-hint"><%= l(:text_psc_enable_auto_generation_help) %></p>
+        </div>
+      </div>
+    </div>
 
-    <p>
-      <label><%= l(:setting_psc_weekly_start_day) %></label>
-      <%= select_tag 'psc_setting[weekly_start_day]',
-                     options_for_select([
-                       [l(:day_name_monday), 1],
-                       [l(:day_name_tuesday), 2],
-                       [l(:day_name_wednesday), 3],
-                       [l(:day_name_thursday), 4],
-                       [l(:day_name_friday), 5]
-                     ], @settings.weekly_start_day) %>
-      <em class="info"><%= l(:text_psc_weekly_start_day_help) %></em>
-    </p>
+    <!-- Issue Templates Section -->
+    <div class="psc-settings-section">
+      <div class="psc-settings-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <h3><%= l(:label_psc_issue_templates) %></h3>
+      </div>
+      <div class="psc-settings-content">
+        <div class="psc-form-row">
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:field_tracker) %></label>
+            <%= select_tag 'psc_setting[default_tracker_id]',
+                           options_from_collection_for_select(@trackers, :id, :name, @settings.default_tracker_id),
+                           include_blank: true, class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_tracker_help) %></p>
+          </div>
 
-    <p>
-      <label><%= l(:setting_psc_monthly_start_day) %></label>
-      <%= select_tag 'psc_setting[monthly_start_day]',
-                     options_for_select((1..28).map { |d| [d, d] }, @settings.monthly_start_day) %>
-      <em class="info"><%= l(:text_psc_monthly_start_day_help) %></em>
-    </p>
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:field_priority) %></label>
+            <%= select_tag 'psc_setting[default_priority_id]',
+                           options_from_collection_for_select(@priorities, :id, :name, @settings.default_priority_id),
+                           include_blank: true, class: 'psc-form-select' %>
+          </div>
 
-    <p>
-      <label><%= l(:setting_psc_quarterly_start_month) %></label>
-      <%= select_tag 'psc_setting[quarterly_start_month]',
-                     options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.quarterly_start_month) %>
-      <em class="info"><%= l(:text_psc_quarterly_start_month_help) %></em>
-    </p>
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:field_status) %></label>
+            <%= select_tag 'psc_setting[default_status_id]',
+                           options_from_collection_for_select(@statuses, :id, :name, @settings.default_status_id),
+                           include_blank: true, class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_default_status_help) %></p>
+          </div>
+        </div>
 
-    <p>
-      <label><%= l(:setting_psc_six_monthly_start_month) %></label>
-      <%= select_tag 'psc_setting[six_monthly_start_month]',
-                     options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.six_monthly_start_month) %>
-      <em class="info"><%= l(:text_psc_six_monthly_start_month_help) %></em>
-    </p>
+        <div class="psc-form-group">
+          <label class="psc-form-label"><%= l(:setting_psc_issue_subject_template) %></label>
+          <%= text_field_tag 'psc_setting[issue_subject_template]', @settings.issue_subject_template, class: 'psc-form-input psc-input-full' %>
+        </div>
 
-    <p>
-      <label><%= l(:setting_psc_yearly_start_month) %></label>
-      <%= select_tag 'psc_setting[yearly_start_month]',
-                     options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.yearly_start_month) %>
-      <em class="info"><%= l(:text_psc_yearly_start_month_help) %></em>
-    </p>
+        <div class="psc-form-group">
+          <label class="psc-form-label"><%= l(:setting_psc_issue_description_template) %></label>
+          <%= text_area_tag 'psc_setting[issue_description_template]', @settings.issue_description_template, rows: 8, class: 'psc-form-textarea' %>
+        </div>
+
+        <div class="psc-variables-panel">
+          <div class="psc-variables-header" onclick="this.parentElement.classList.toggle('expanded');">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+            <%= l(:label_psc_available_variables) %>
+          </div>
+          <div class="psc-variables-content">
+            <div class="psc-variables-grid">
+              <div class="psc-variable-item">
+                <code>{{control_id}}</code>
+                <span><%= l(:text_psc_var_control_id) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{control_name}}</code>
+                <span><%= l(:text_psc_var_control_name) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{category}}</code>
+                <span><%= l(:text_psc_var_category) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{period}}</code>
+                <span><%= l(:text_psc_var_period) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{year}}</code>
+                <span><%= l(:text_psc_var_year) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{frequency}}</code>
+                <span><%= l(:text_psc_var_frequency) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{scheduled_date}}</code>
+                <span><%= l(:text_psc_var_scheduled_date) %></span>
+              </div>
+              <div class="psc-variable-item">
+                <code>{{due_date}}</code>
+                <span><%= l(:text_psc_var_due_date) %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Configuration Section -->
+    <div class="psc-settings-section">
+      <div class="psc-settings-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <h3><%= l(:label_psc_schedule_configuration) %></h3>
+      </div>
+      <div class="psc-settings-content">
+        <div class="psc-form-row">
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:setting_psc_weekly_start_day) %></label>
+            <%= select_tag 'psc_setting[weekly_start_day]',
+                           options_for_select([
+                             [l(:day_name_monday), 1],
+                             [l(:day_name_tuesday), 2],
+                             [l(:day_name_wednesday), 3],
+                             [l(:day_name_thursday), 4],
+                             [l(:day_name_friday), 5]
+                           ], @settings.weekly_start_day), class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_weekly_start_day_help) %></p>
+          </div>
+
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:setting_psc_monthly_start_day) %></label>
+            <%= select_tag 'psc_setting[monthly_start_day]',
+                           options_for_select((1..28).map { |d| [d, d] }, @settings.monthly_start_day), class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_monthly_start_day_help) %></p>
+          </div>
+        </div>
+
+        <div class="psc-form-row">
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:setting_psc_quarterly_start_month) %></label>
+            <%= select_tag 'psc_setting[quarterly_start_month]',
+                           options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.quarterly_start_month), class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_quarterly_start_month_help) %></p>
+          </div>
+
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:setting_psc_six_monthly_start_month) %></label>
+            <%= select_tag 'psc_setting[six_monthly_start_month]',
+                           options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.six_monthly_start_month), class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_six_monthly_start_month_help) %></p>
+          </div>
+
+          <div class="psc-form-group">
+            <label class="psc-form-label"><%= l(:setting_psc_yearly_start_month) %></label>
+            <%= select_tag 'psc_setting[yearly_start_month]',
+                           options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.yearly_start_month), class: 'psc-form-select' %>
+            <p class="psc-form-hint"><%= l(:text_psc_yearly_start_month_help) %></p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <p>
-    <%= submit_tag l(:button_save) %>
-    <%= link_to l(:button_cancel), project_psc_control_points_path(@project) %>
-  </p>
+  <div class="psc-form-actions">
+    <%= submit_tag l(:button_save), class: 'psc-btn psc-btn-primary' %>
+    <%= link_to l(:button_cancel), project_psc_control_points_path(@project), class: 'psc-btn psc-btn-secondary' %>
+  </div>
 <% end %>

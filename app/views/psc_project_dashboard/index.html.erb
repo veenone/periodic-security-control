@@ -1,0 +1,297 @@
+<%= title "#{l(:label_psc_dashboard)} - #{@year}" %>
+
+<div class="contextual">
+  <%= form_tag(project_psc_project_dashboard_path(@project), method: :get, class: 'psc-year-selector') do %>
+    <%= l(:field_year) %>:
+    <%= select_tag :year, options_for_select((Date.current.year - 2..Date.current.year + 1).to_a.reverse, @year), onchange: 'this.form.submit();' %>
+  <% end %>
+  <%= link_to l(:label_psc_calendar), calendar_project_psc_schedules_path(@project, year: @year), class: 'icon icon-calendar' %>
+  <%= link_to l(:label_psc_schedules), project_psc_schedules_path(@project, year: @year), class: 'icon icon-list' %>
+</div>
+
+<!-- Summary Cards -->
+<div class="psc-summary-cards">
+  <div class="psc-card psc-card-total">
+    <div class="psc-card-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+    </div>
+    <div class="psc-card-value"><%= @statistics[:total] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_total) %></div>
+  </div>
+  <div class="psc-card psc-card-completed">
+    <div class="psc-card-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div class="psc-card-value"><%= @statistics[:completed] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_completed) %> (<%= @statistics[:completion_rate] %>%)</div>
+  </div>
+  <div class="psc-card psc-card-pending">
+    <div class="psc-card-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    <div class="psc-card-value"><%= @statistics[:pending] + @statistics[:generated] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_pending) %></div>
+  </div>
+  <div class="psc-card psc-card-overdue">
+    <div class="psc-card-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <div class="psc-card-value"><%= @statistics[:overdue] %></div>
+    <div class="psc-card-label"><%= l(:label_psc_overdue) %></div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="psc-charts-row">
+  <!-- Donut Chart - Status Distribution -->
+  <div class="psc-chart-card">
+    <div class="psc-chart-header">
+      <h3 class="psc-chart-title"><%= l(:label_psc_schedule_status) %></h3>
+    </div>
+    <%
+      total = [@statistics[:total], 1].max
+      completed_pct = (@statistics[:completed].to_f / total * 100).round(1)
+      pending_pct = (@statistics[:pending].to_f / total * 100).round(1)
+      generated_pct = (@statistics[:generated].to_f / total * 100).round(1)
+      overdue_pct = (@statistics[:overdue].to_f / total * 100).round(1)
+      skipped_pct = (@statistics[:skipped].to_f / total * 100).round(1)
+
+      # Calculate stroke-dasharray values (circumference = 2 * PI * 82.5 = 518.36)
+      circumference = 518.36
+      completed_dash = (completed_pct / 100.0 * circumference).round(2)
+      pending_dash = (pending_pct / 100.0 * circumference).round(2)
+      generated_dash = (generated_pct / 100.0 * circumference).round(2)
+      overdue_dash = (overdue_pct / 100.0 * circumference).round(2)
+
+      # Calculate offsets
+      completed_offset = 0
+      pending_offset = completed_dash
+      generated_offset = pending_offset + pending_dash
+      overdue_offset = generated_offset + generated_dash
+    %>
+    <div class="psc-donut-chart">
+      <svg class="psc-donut-svg" viewBox="0 0 200 200">
+        <% if @statistics[:total] > 0 %>
+          <circle class="psc-donut-segment" cx="100" cy="100" r="82.5"
+                  stroke="#10b981"
+                  stroke-dasharray="<%= completed_dash %> <%= circumference %>"
+                  stroke-dashoffset="0"/>
+          <circle class="psc-donut-segment" cx="100" cy="100" r="82.5"
+                  stroke="#f59e0b"
+                  stroke-dasharray="<%= pending_dash %> <%= circumference %>"
+                  stroke-dashoffset="-<%= completed_dash %>"/>
+          <circle class="psc-donut-segment" cx="100" cy="100" r="82.5"
+                  stroke="#3b82f6"
+                  stroke-dasharray="<%= generated_dash %> <%= circumference %>"
+                  stroke-dashoffset="-<%= completed_dash + pending_dash %>"/>
+          <circle class="psc-donut-segment" cx="100" cy="100" r="82.5"
+                  stroke="#ef4444"
+                  stroke-dasharray="<%= overdue_dash %> <%= circumference %>"
+                  stroke-dashoffset="-<%= completed_dash + pending_dash + generated_dash %>"/>
+        <% else %>
+          <circle class="psc-donut-segment" cx="100" cy="100" r="82.5"
+                  stroke="#e5e7eb"
+                  stroke-dasharray="<%= circumference %> <%= circumference %>"
+                  stroke-dashoffset="0"/>
+        <% end %>
+      </svg>
+      <div class="psc-donut-center">
+        <div class="psc-donut-value"><%= @statistics[:completion_rate] %>%</div>
+        <div class="psc-donut-label"><%= l(:label_psc_completion_rate) %></div>
+      </div>
+    </div>
+    <div class="psc-donut-legend">
+      <div class="psc-legend-item">
+        <span class="psc-legend-dot completed"></span>
+        <%= l(:label_psc_completed) %> (<%= @statistics[:completed] %>)
+      </div>
+      <div class="psc-legend-item">
+        <span class="psc-legend-dot pending"></span>
+        <%= l(:label_psc_pending) %> (<%= @statistics[:pending] %>)
+      </div>
+      <div class="psc-legend-item">
+        <span class="psc-legend-dot generated"></span>
+        <%= l(:psc_status_generated) %> (<%= @statistics[:generated] %>)
+      </div>
+      <div class="psc-legend-item">
+        <span class="psc-legend-dot overdue"></span>
+        <%= l(:label_psc_overdue) %> (<%= @statistics[:overdue] %>)
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar Chart - Category Progress -->
+  <div class="psc-chart-card">
+    <div class="psc-chart-header">
+      <h3 class="psc-chart-title"><%= l(:label_psc_category_breakdown) %></h3>
+    </div>
+    <div class="psc-bar-chart">
+      <% @category_stats.first(6).each do |stat| %>
+        <% bar_width = stat[:total] > 0 ? (stat[:completed].to_f / stat[:total] * 100).round(1) : 0 %>
+        <div class="psc-bar-chart-row">
+          <div class="psc-bar-chart-label"><%= stat[:category].code %></div>
+          <div class="psc-bar-chart-track">
+            <div class="psc-bar-chart-fill" style="width: <%= bar_width %>%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%);">
+              <% if bar_width > 15 %><span><%= bar_width %>%</span><% end %>
+            </div>
+          </div>
+          <div class="psc-bar-chart-value"><%= stat[:completed] %>/<%= stat[:total] %></div>
+        </div>
+      <% end %>
+      <% if @category_stats.empty? %>
+        <p class="nodata"><%= l(:label_no_data) %></p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly Progress Chart -->
+<div class="psc-section">
+  <h3><%= l(:label_psc_monthly_progress) %></h3>
+  <div class="psc-monthly-chart">
+    <% @monthly_data.each do |month| %>
+      <div class="psc-month-bar">
+        <div class="psc-bar-container">
+          <div class="psc-bar-fill" style="height: <%= month[:completion_rate] %>%;"
+               title="<%= month[:completed] %>/<%= month[:total] %> (<%= month[:completion_rate] %>%)"></div>
+        </div>
+        <div class="psc-bar-label"><%= month[:month_abbr] %></div>
+        <div class="psc-bar-value"><%= month[:completion_rate] %>%</div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="splitcontentleft">
+  <!-- Overdue Controls -->
+  <div class="psc-section">
+    <div class="psc-section-header">
+      <div>
+        <h3 class="psc-section-title"><%= l(:label_psc_overdue_controls) %></h3>
+        <div class="psc-section-subtitle"><%= @statistics[:overdue] %> <%= l(:label_psc_overdue_short) %></div>
+      </div>
+      <% if @statistics[:overdue] > 0 %>
+        <%= link_to l(:label_psc_view_all_overdue), project_psc_schedules_path(@project, year: @year, status: 'overdue'), class: 'psc-btn psc-btn-secondary' %>
+      <% end %>
+    </div>
+    <% if @overdue_schedules.any? %>
+      <table class="psc-table psc-table-compact">
+        <thead>
+          <tr>
+            <th><%= l(:field_control_id) %></th>
+            <th><%= l(:field_due_date) %></th>
+            <th class="text-right"><%= l(:label_psc_days_late) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @overdue_schedules.each do |schedule| %>
+            <tr>
+              <td>
+                <%= link_to schedule.control_point.full_control_id,
+                    project_psc_control_point_path(@project, schedule.control_point) %>
+              </td>
+              <td><%= format_date(schedule.due_date) %></td>
+              <td class="text-right psc-days-overdue"><%= schedule.days_overdue %> <%= l(:label_days) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="nodata"><%= l(:label_psc_no_overdue) %></p>
+    <% end %>
+  </div>
+</div>
+
+<div class="splitcontentright">
+  <!-- Upcoming Controls -->
+  <div class="psc-section">
+    <div class="psc-section-header">
+      <div>
+        <h3 class="psc-section-title"><%= l(:label_psc_upcoming_controls) %></h3>
+        <div class="psc-section-subtitle"><%= @upcoming_schedules.size %> in next 30 days</div>
+      </div>
+    </div>
+    <% if @upcoming_schedules.any? %>
+      <table class="psc-table psc-table-compact">
+        <thead>
+          <tr>
+            <th><%= l(:field_control_id) %></th>
+            <th><%= l(:field_scheduled_date) %></th>
+            <th class="text-right"><%= l(:label_psc_days_until) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @upcoming_schedules.each do |schedule| %>
+            <tr>
+              <td>
+                <%= link_to schedule.control_point.full_control_id,
+                    project_psc_control_point_path(@project, schedule.control_point) %>
+              </td>
+              <td><%= format_date(schedule.scheduled_date) %></td>
+              <td class="text-right psc-days-until"><%= schedule.days_until_due || '-' %> <%= l(:label_days) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="nodata"><%= l(:label_psc_no_upcoming) %></p>
+    <% end %>
+  </div>
+</div>
+
+<div style="clear: both;"></div>
+
+<!-- Category Breakdown Table -->
+<div class="psc-section">
+  <div class="psc-section-header">
+    <h3 class="psc-section-title"><%= l(:label_psc_category_breakdown) %></h3>
+  </div>
+  <% if @category_stats.any? %>
+    <table class="psc-table">
+      <thead>
+        <tr>
+          <th><%= l(:label_psc_category) %></th>
+          <th class="text-center"><%= l(:label_psc_total) %></th>
+          <th class="text-center"><%= l(:label_psc_completed) %></th>
+          <th class="text-center"><%= l(:label_psc_pending) %></th>
+          <th class="text-center"><%= l(:label_psc_overdue) %></th>
+          <th><%= l(:label_psc_completion_rate) %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @category_stats.each do |stat| %>
+          <tr>
+            <td>
+              <%= link_to stat[:category].name, project_psc_category_path(@project, stat[:category]) %>
+              <span class="psc-category-code">(<%= stat[:category].code %>)</span>
+            </td>
+            <td class="text-center"><%= stat[:total] %></td>
+            <td class="text-center psc-status-completed"><%= stat[:completed] %></td>
+            <td class="text-center"><%= stat[:pending] %></td>
+            <td class="text-center psc-status-overdue"><%= stat[:overdue] %></td>
+            <td>
+              <div class="psc-mini-progress">
+                <div class="psc-mini-bar" style="width: <%= stat[:completion_rate] %>%;"></div>
+              </div>
+              <strong><%= stat[:completion_rate] %>%</strong>
+            </td>
+            <td>
+              <%= link_to l(:label_psc_view), project_psc_schedules_path(@project, year: @year, category_id: stat[:category].id), class: 'icon icon-list' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% end %>
+</div>

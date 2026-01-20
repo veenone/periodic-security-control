@@ -1,6 +1,4 @@
-<%= title l(:label_psc_category_edit) %>
-
-<h2><%= l(:label_psc_category_edit) %>: <%= @category.name %></h2>
+<%= title "#{l(:label_psc_category_edit)}: #{@category.name}" %>
 
 <%= form_tag(project_psc_category_path(@project, @category), method: :patch) do %>
   <div class="box tabular">

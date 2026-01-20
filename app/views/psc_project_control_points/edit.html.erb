@@ -1,6 +1,4 @@
-<%= title l(:label_psc_control_point_edit) %>
-
-<h2><%= l(:label_psc_control_point_edit) %>: <%= @control_point.full_control_id %></h2>
+<%= title "#{l(:label_psc_control_point_edit)}: #{@control_point.full_control_id}" %>
 
 <%= form_tag(project_psc_control_point_path(@project, @control_point), method: :patch) do %>
   <div class="box tabular">

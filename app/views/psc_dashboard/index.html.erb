@@ -1,4 +1,4 @@
-<%= title l(:label_psc_dashboard) %>
+<%= title "#{l(:label_psc_dashboard)} - #{@year}" %>
 
 <div class="contextual">
   <%= form_tag(psc_dashboard_path, method: :get, class: 'psc-year-selector') do %>
@@ -8,8 +8,6 @@
   <%= link_to l(:label_psc_calendar), psc_dashboard_calendar_path(year: @year), class: 'icon icon-calendar' %>
   <%= link_to l(:label_psc_schedules), psc_schedules_path(year: @year), class: 'icon icon-list' %>
 </div>
-
-<h2><%= l(:label_psc_dashboard) %> - <%= @year %></h2>
 
 <!-- Summary Cards -->
 <div class="psc-summary-cards">

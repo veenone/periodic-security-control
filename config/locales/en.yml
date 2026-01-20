@@ -32,6 +32,9 @@ en:
   label_psc_complete: "Complete"
   label_psc_reopen: "Reopen"
   label_psc_calendar: "Calendar"
+  label_filter: "Filter"
+  button_complete: "Complete"
+  button_skip: "Skip"
 
   # Dashboard
   label_psc_total: "Total"
@@ -156,6 +159,8 @@ en:
   text_psc_rake_generate_schedules: "Generate schedules for a specific year"
   text_psc_rake_statistics: "Show statistics for a year"
   text_psc_rake_seed: "Initialize plugin with sample data"
+  text_psc_rake_reset_missing_issues: "Reset schedules where linked issue was deleted"
+  text_psc_rake_daily: "Run all daily maintenance tasks"
 
   # Code format
   text_psc_code_format: "2-5 uppercase letters (e.g., ACS, VSS)"
@@ -178,6 +183,7 @@ en:
   notice_psc_bulk_generate_success: "Generated %{count} issues successfully."
   notice_psc_bulk_generate_partial: "Generated %{count} issues. %{errors} errors occurred."
   notice_psc_schedules_generated_no_issues: "Schedules generated for %{schedule_count} control points. No issues due yet."
+  notice_psc_orphaned_schedules_reset: "Reset %{count} orphaned schedules (linked issues were deleted)."
   notice_psc_overdue_updated: "Updated %{count} schedules to overdue status."
   notice_psc_import_successful: "Imported %{count} records successfully."
 

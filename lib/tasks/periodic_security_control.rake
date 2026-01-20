@@ -70,9 +70,17 @@ namespace :periodic_security_control do
     puts "Cleaned up #{count} orphaned schedules"
   end
 
+  desc 'Reset schedules with missing issues (issues that were deleted)'
+  task reset_missing_issues: :environment do
+    puts "Resetting schedules with missing issues..."
+    count = PscScheduleGenerator.reset_schedules_with_missing_issues
+    puts "Reset #{count} schedules with missing issues"
+  end
+
   desc 'Run all daily maintenance tasks'
   task daily: :environment do
     Rake::Task['periodic_security_control:update_overdue'].invoke
+    Rake::Task['periodic_security_control:reset_missing_issues'].invoke
     Rake::Task['periodic_security_control:generate_issues'].invoke
     Rake::Task['periodic_security_control:sync_completed'].invoke
   end

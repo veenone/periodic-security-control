@@ -6,86 +6,109 @@
               data: { confirm: l(:text_psc_bulk_generate_confirm) } %>
 </div>
 
-<h2><%= l(:label_psc_schedules) %></h2>
+<div class="psc-section">
+  <%= form_tag(project_psc_schedules_path(@project), method: :get, class: 'psc-filter-form') do %>
+    <div class="psc-filter-row">
+      <div class="psc-filter-group">
+        <label><%= l(:field_year) %></label>
+        <%= select_tag :year, options_for_select((Date.current.year - 2..Date.current.year + 1).to_a.reverse, @year) %>
+      </div>
 
-<%= form_tag(project_psc_schedules_path(@project), method: :get, class: 'psc-filter-form') do %>
-  <fieldset>
-    <legend><%= l(:label_filter) %></legend>
-    <p>
-      <label><%= l(:field_year) %>:</label>
-      <%= select_tag :year, options_for_select((Date.current.year - 2..Date.current.year + 1).to_a.reverse, @year) %>
+      <div class="psc-filter-group">
+        <label><%= l(:field_status) %></label>
+        <%= select_tag :status, options_for_select([['', '']] + PscSchedule::STATUSES.map { |s| [l("psc_status_#{s}"), s] }, @status_filter) %>
+      </div>
 
-      <label><%= l(:field_status) %>:</label>
-      <%= select_tag :status, options_for_select([['', '']] + PscSchedule::STATUSES.map { |s| [l("psc_status_#{s}"), s] }, @status_filter) %>
+      <div class="psc-filter-group">
+        <label><%= l(:label_psc_category) %></label>
+        <%= select_tag :category_id, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @category_filter) %>
+      </div>
 
-      <label><%= l(:label_psc_category) %>:</label>
-      <%= select_tag :category_id, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @category_filter) %>
-
-      <%= submit_tag l(:button_apply), name: nil %>
-      <%= link_to l(:button_clear), project_psc_schedules_path(@project) %>
-    </p>
-  </fieldset>
-<% end %>
+      <div class="psc-filter-actions">
+        <%= submit_tag l(:button_apply), name: nil, class: 'psc-btn psc-btn-primary' %>
+        <%= link_to l(:button_clear), project_psc_schedules_path(@project), class: 'psc-btn psc-btn-secondary' %>
+      </div>
+    </div>
+  <% end %>
+</div>
 
 <% if @schedules.any? %>
-  <table class="list psc-schedules-table">
-    <thead>
-      <tr>
-        <th><%= l(:label_psc_category) %></th>
-        <th><%= l(:field_control_id) %></th>
-        <th><%= l(:field_name) %></th>
-        <%= sort_header_tag('scheduled_date', caption: l(:field_scheduled_date)) %>
-        <%= sort_header_tag('due_date', caption: l(:field_due_date)) %>
-        <%= sort_header_tag('status', caption: l(:field_status)) %>
-        <th><%= l(:field_issue) %></th>
-        <th><%= l(:label_actions) %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @schedules.each do |schedule| %>
-        <tr class="<%= cycle('odd', 'even') %> <%= schedule.status_css_class %>">
-          <td class="category"><%= schedule.control_point.category.code %></td>
-          <td class="control-id"><strong><%= schedule.control_point.full_control_id %></strong></td>
-          <td class="name"><%= truncate(schedule.control_point.name, length: 40) %></td>
-          <td class="scheduled-date"><%= format_date(schedule.scheduled_date) %></td>
-          <td class="due-date">
-            <%= format_date(schedule.due_date) %>
-            <% if schedule.overdue? %>
-              <span class="psc-overdue-badge">(<%= l(:label_psc_days_overdue, days: schedule.days_overdue) %>)</span>
-            <% end %>
-          </td>
-          <td class="status">
-            <span class="psc-status <%= schedule.status_css_class %>">
-              <%= l("psc_status_#{schedule.status}") %>
-            </span>
-          </td>
-          <td class="issue">
-            <% if schedule.issue %>
-              <%= link_to "##{schedule.issue.id}", issue_path(schedule.issue) %>
-            <% else %>
-              -
-            <% end %>
-          </td>
-          <td class="buttons">
-            <% if schedule.pending? %>
-              <%= link_to l(:label_psc_generate_issue_short), generate_issue_project_psc_schedule_path(@project, schedule),
-                          method: :post, class: 'icon icon-add', title: l(:label_psc_generate_issue) %>
-              <%= link_to l(:button_skip), skip_project_psc_schedule_path(@project, schedule),
-                          method: :post, class: 'icon icon-cancel', title: l(:label_psc_skip) %>
-            <% elsif schedule.generated? %>
-              <%= link_to l(:button_complete), complete_project_psc_schedule_path(@project, schedule),
-                          method: :post, class: 'icon icon-checked', title: l(:label_psc_complete) %>
-            <% elsif schedule.completed? || schedule.skipped? %>
-              <%= link_to l(:button_reopen), reopen_project_psc_schedule_path(@project, schedule),
-                          method: :post, class: 'icon icon-reload', title: l(:label_psc_reopen) %>
-            <% end %>
-          </td>
+  <div class="psc-section">
+    <table class="psc-table">
+      <thead>
+        <tr>
+          <th><%= l(:label_psc_category) %></th>
+          <th><%= l(:field_control_id) %></th>
+          <th><%= l(:field_name) %></th>
+          <%= sort_header_tag('scheduled_date', caption: l(:field_scheduled_date)) %>
+          <%= sort_header_tag('due_date', caption: l(:field_due_date)) %>
+          <%= sort_header_tag('status', caption: l(:field_status)) %>
+          <th><%= l(:field_issue) %></th>
+          <th><%= l(:label_actions) %></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @schedules.each do |schedule| %>
+          <tr class="<%= schedule.status_css_class %>">
+            <td>
+              <span class="psc-code-badge"><%= schedule.control_point.category.code %></span>
+            </td>
+            <td>
+              <span class="psc-control-id"><%= schedule.control_point.full_control_id %></span>
+            </td>
+            <td class="psc-name-cell"><%= truncate(schedule.control_point.name, length: 40) %></td>
+            <td><%= format_date(schedule.scheduled_date) %></td>
+            <td>
+              <%= format_date(schedule.due_date) %>
+              <% if schedule.overdue? %>
+                <span class="psc-overdue-badge"><%= l(:label_psc_days_overdue, days: schedule.days_overdue) %></span>
+              <% end %>
+            </td>
+            <td>
+              <span class="psc-status-badge psc-status-<%= schedule.status %>">
+                <%= l("psc_status_#{schedule.status}") %>
+              </span>
+            </td>
+            <td>
+              <% if schedule.issue %>
+                <%= link_to "##{schedule.issue.id}", issue_path(schedule.issue), class: 'psc-issue-link' %>
+              <% else %>
+                <span class="psc-no-issue">-</span>
+              <% end %>
+            </td>
+            <td class="psc-actions">
+              <% if schedule.pending? %>
+                <%= link_to l(:label_psc_generate_issue_short), generate_issue_project_psc_schedule_path(@project, schedule),
+                            method: :post, class: 'icon icon-add', title: l(:label_psc_generate_issue) %>
+                <%= link_to l(:button_skip), skip_project_psc_schedule_path(@project, schedule),
+                            method: :post, class: 'icon icon-cancel', title: l(:label_psc_skip) %>
+              <% elsif schedule.generated? %>
+                <%= link_to l(:button_complete), complete_project_psc_schedule_path(@project, schedule),
+                            method: :post, class: 'icon icon-checked', title: l(:label_psc_complete) %>
+              <% elsif schedule.completed? || schedule.skipped? %>
+                <%= link_to l(:button_reopen), reopen_project_psc_schedule_path(@project, schedule),
+                            method: :post, class: 'icon icon-reload', title: l(:label_psc_reopen) %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
-  <p class="pagination"><%= pagination_links_full @schedule_pages, @schedule_count %></p>
+    <div class="psc-pagination">
+      <%= pagination_links_full @schedule_pages, @schedule_count %>
+    </div>
+  </div>
 <% else %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+  <div class="psc-empty-state">
+    <div class="psc-empty-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <p><%= l(:label_no_data) %></p>
+  </div>
 <% end %>

@@ -110,15 +110,13 @@ class PscProjectSchedulesController < ApplicationController
     end
 
     # Reset schedules where linked issue was deleted
-    orphaned_schedules = PscSchedule.where(status: 'generated')
+    orphaned_schedules = PscSchedule.with_missing_issues
                                     .joins(control_point: :category)
                                     .where(psc_control_categories: { project_id: @project.id })
                                     .for_year(year)
     orphaned_schedules.find_each do |schedule|
-      if schedule.issue_id.present? && !Issue.exists?(schedule.issue_id)
-        schedule.update!(status: 'pending', issue_id: nil, generated_at: nil)
-        reset_count += 1
-      end
+      schedule.reset_orphaned!
+      reset_count += 1
     end
 
     # Get project settings for advance_days
@@ -140,12 +138,18 @@ class PscProjectSchedulesController < ApplicationController
       end
     end
 
+    messages = []
+    messages << l(:notice_psc_orphaned_schedules_reset, count: reset_count) if reset_count > 0
+
     if errors.any?
-      flash[:warning] = l(:notice_psc_bulk_generate_partial, count: generated_count, errors: errors.count)
+      messages << l(:notice_psc_bulk_generate_partial, count: generated_count, errors: errors.count)
+      flash[:warning] = messages.join(' ')
     elsif generated_count > 0
-      flash[:notice] = l(:notice_psc_bulk_generate_success, count: generated_count)
+      messages << l(:notice_psc_bulk_generate_success, count: generated_count)
+      flash[:notice] = messages.join(' ')
     else
-      flash[:notice] = l(:notice_psc_schedules_generated_no_issues, schedule_count: schedule_count)
+      messages << l(:notice_psc_schedules_generated_no_issues, schedule_count: schedule_count)
+      flash[:notice] = messages.join(' ')
     end
 
     redirect_to project_psc_schedules_path(@project, year: year)

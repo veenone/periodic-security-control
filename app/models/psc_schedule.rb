@@ -32,6 +32,15 @@ class PscSchedule < (defined?(ApplicationRecord) == 'constant' ? ApplicationReco
   scope :by_category, ->(category_id) {
     joins(:control_point).where(psc_control_points: { category_id: category_id })
   }
+  # Find schedules with status 'generated' or 'overdue' but no valid linked issue
+  # This catches two cases:
+  # 1. issue_id is NULL but status indicates an issue should exist
+  # 2. issue_id points to a deleted issue
+  scope :with_missing_issues, -> {
+    left_joins(:issue)
+      .where(status: %w[generated overdue])
+      .where('psc_schedules.issue_id IS NULL OR issues.id IS NULL')
+  }
 
   safe_attributes 'status', 'notes', 'scheduled_date', 'due_date'
 
@@ -99,6 +108,14 @@ class PscSchedule < (defined?(ApplicationRecord) == 'constant' ? ApplicationReco
 
   def reopen!
     update!(status: issue.present? ? 'generated' : 'pending', completed_at: nil)
+  end
+
+  def reset_orphaned!
+    update!(status: 'pending', issue_id: nil, generated_at: nil)
+  end
+
+  def issue_deleted?
+    issue_id.present? && !Issue.exists?(issue_id)
   end
 
   def pending?

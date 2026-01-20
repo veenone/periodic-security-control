@@ -42,15 +42,26 @@ Redmine::Plugin.register :periodic_security_control do
        caption: :label_psc_dashboard,
        if: Proc.new { User.current.logged? && User.current.allowed_to_globally?(:view_psc_dashboard) }
 
-  # Project menu - Main "Periodic Security Control" menu item
+  # Project menu - Main "Periodic Security Control" menu item (points to dashboard)
   menu :project_menu, :periodic_security_control,
-       { controller: 'psc_project_control_points', action: 'index' },
+       { controller: 'psc_project_dashboard', action: 'index' },
        caption: :label_periodic_security_control,
        after: :activity,
        param: :project_id,
        if: Proc.new { |project|
          project.module_enabled?(:periodic_security_control) &&
-         User.current.allowed_to?(:view_psc_categories, project)
+         User.current.allowed_to?(:view_psc_dashboard, project)
+       }
+
+  # Sub-menu: Dashboard
+  menu :project_menu, :psc_dashboard,
+       { controller: 'psc_project_dashboard', action: 'index' },
+       caption: :label_psc_dashboard,
+       parent: :periodic_security_control,
+       param: :project_id,
+       if: Proc.new { |project|
+         project.module_enabled?(:periodic_security_control) &&
+         User.current.allowed_to?(:view_psc_dashboard, project)
        }
 
   # Sub-menu: Control Points
@@ -100,7 +111,10 @@ Redmine::Plugin.register :periodic_security_control do
   # Project module definition
   project_module :periodic_security_control do
     # View permissions
-    permission :view_psc_dashboard, { psc_dashboard: [:index, :calendar] }, public: true, read: true
+    permission :view_psc_dashboard, {
+      psc_dashboard: [:index, :calendar],
+      psc_project_dashboard: [:index]
+    }, public: true, read: true
     permission :view_psc_categories, {
       psc_categories: [:index, :show],
       psc_control_points: [:index, :show],
