@@ -1,10 +1,10 @@
 <%= title "#{@control_point.full_control_id} - #{@control_point.name}" %>
 
 <div class="contextual">
-  <%= link_to l(:button_edit), edit_project_psc_control_point_path(@project, @control_point), class: 'icon icon-edit' %>
+  <%= link_to l(:button_edit), edit_project_psc_control_point_path(@project, @control_point), class: 'psc-btn psc-btn-secondary' %>
   <%= form_tag(generate_schedules_project_psc_control_point_path(@project, @control_point), method: :post, style: 'display: inline;', class: 'psc-inline-form') do %>
     <%= select_tag :year, options_for_select((Date.current.year - 1..Date.current.year + 2).to_a, Date.current.year), class: 'psc-inline-select' %>
-    <%= submit_tag l(:label_psc_generate_schedules_short), class: 'small' %>
+    <%= submit_tag l(:label_psc_generate_schedules_short), class: 'psc-btn psc-btn-primary' %>
   <% end %>
 </div>
 

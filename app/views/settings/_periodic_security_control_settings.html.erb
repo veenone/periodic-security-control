@@ -66,23 +66,23 @@
 
   <pre class="psc-cron-example">
 # Daily at 6 AM - generate issues for due schedules
-0 6 * * * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_security_control:generate_issues
+0 6 * * * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_control:generate_issues
 
 # Daily at midnight - update overdue statuses
-0 0 * * * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_security_control:update_overdue
+0 0 * * * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_control:update_overdue
 
 # December 1st - generate next year schedules
-0 0 1 12 * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_security_control:generate_next_year_schedules
+0 0 1 12 * cd /path/to/redmine && RAILS_ENV=production bundle exec rake periodic_control:generate_next_year_schedules
   </pre>
 
   <p>
     <strong><%= l(:label_psc_available_rake_tasks) %>:</strong>
   </p>
   <ul>
-    <li><code>rake periodic_security_control:generate_issues</code> - <%= l(:text_psc_rake_generate_issues) %></li>
-    <li><code>rake periodic_security_control:update_overdue</code> - <%= l(:text_psc_rake_update_overdue) %></li>
-    <li><code>rake periodic_security_control:generate_schedules[YEAR]</code> - <%= l(:text_psc_rake_generate_schedules) %></li>
-    <li><code>rake periodic_security_control:statistics[YEAR]</code> - <%= l(:text_psc_rake_statistics) %></li>
-    <li><code>rake periodic_security_control:seed</code> - <%= l(:text_psc_rake_seed) %></li>
+    <li><code>rake periodic_control:generate_issues</code> - <%= l(:text_psc_rake_generate_issues) %></li>
+    <li><code>rake periodic_control:update_overdue</code> - <%= l(:text_psc_rake_update_overdue) %></li>
+    <li><code>rake periodic_control:generate_schedules[YEAR]</code> - <%= l(:text_psc_rake_generate_schedules) %></li>
+    <li><code>rake periodic_control:statistics[YEAR]</code> - <%= l(:text_psc_rake_statistics) %></li>
+    <li><code>rake periodic_control:seed</code> - <%= l(:text_psc_rake_seed) %></li>
   </ul>
 </div>

@@ -20,9 +20,9 @@ Rails.application.config.to_prepare do
 end
 
 Redmine::Plugin.register :periodic_security_control do
-  name 'Periodic Security Control'
+  name 'Periodic Control'
   author 'Security Team'
-  description 'Manages periodic security control schedules and auto-generates issues for tracking compliance activities'
+  description 'Manages periodic control schedules and auto-generates issues for tracking compliance activities'
   version '1.0.0'
   url 'https://github.com/yourorg/redmine_periodic_security_control'
   author_url 'https://yourorg.com'
@@ -42,7 +42,7 @@ Redmine::Plugin.register :periodic_security_control do
        caption: :label_psc_dashboard,
        if: Proc.new { User.current.logged? && User.current.allowed_to_globally?(:view_psc_dashboard) }
 
-  # Project menu - Main "Periodic Security Control" menu item (points to dashboard)
+  # Project menu - Main "Periodic Control" menu item (points to dashboard)
   menu :project_menu, :periodic_security_control,
        { controller: 'psc_project_dashboard', action: 'index' },
        caption: :label_periodic_security_control,

@@ -1,8 +1,8 @@
 <%= title l(:label_psc_schedules) %>
 
 <div class="contextual">
-  <%= link_to l(:label_psc_calendar), calendar_project_psc_schedules_path(@project, year: @year), class: 'icon icon-calendar' %>
-  <%= link_to l(:label_psc_bulk_generate), bulk_generate_project_psc_schedules_path(@project, year: @year), method: :post, class: 'icon icon-reload',
+  <%= link_to l(:label_psc_calendar), calendar_project_psc_schedules_path(@project, year: @year), class: 'psc-btn psc-btn-secondary' %>
+  <%= link_to l(:label_psc_bulk_generate), bulk_generate_project_psc_schedules_path(@project, year: @year), method: :post, class: 'psc-btn psc-btn-primary',
               data: { confirm: l(:text_psc_bulk_generate_confirm) } %>
 </div>
 

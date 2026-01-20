@@ -87,7 +87,7 @@ class PscCategoriesController < ApplicationController
 
     respond_to do |format|
       format.csv do
-        send_data export_to_csv, filename: "#{@project.identifier}_security_controls_#{Date.current.iso8601}.csv"
+        send_data export_to_csv, filename: "#{@project.identifier}_controls_#{Date.current.iso8601}.csv"
       end
     end
   end

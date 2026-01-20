@@ -50,7 +50,7 @@
             <label class="psc-form-label"><%= l(:field_tracker) %></label>
             <%= select_tag 'psc_setting[default_tracker_id]',
                            options_from_collection_for_select(@trackers, :id, :name, @settings.default_tracker_id),
-                           include_blank: true, class: 'psc-form-select' %>
+                           include_blank: true, class: 'psc-form-select', id: 'psc_tracker_select' %>
             <p class="psc-form-hint"><%= l(:text_psc_tracker_help) %></p>
           </div>
 
@@ -65,7 +65,7 @@
             <label class="psc-form-label"><%= l(:field_status) %></label>
             <%= select_tag 'psc_setting[default_status_id]',
                            options_from_collection_for_select(@statuses, :id, :name, @settings.default_status_id),
-                           include_blank: true, class: 'psc-form-select' %>
+                           include_blank: true, class: 'psc-form-select', id: 'psc_status_select' %>
             <p class="psc-form-hint"><%= l(:text_psc_default_status_help) %></p>
           </div>
         </div>
@@ -192,3 +192,60 @@
     <%= link_to l(:button_cancel), project_psc_control_points_path(@project), class: 'psc-btn psc-btn-secondary' %>
   </div>
 <% end %>
+
+<script>
+(function() {
+  'use strict';
+
+  var trackerSelect = document.getElementById('psc_tracker_select');
+  var statusSelect = document.getElementById('psc_status_select');
+  var statusUrl = '<%= tracker_statuses_project_psc_settings_path(@project) %>';
+
+  if (trackerSelect && statusSelect) {
+    trackerSelect.addEventListener('change', function() {
+      var trackerId = this.value;
+      var currentStatusId = statusSelect.value;
+
+      // Clear current options except blank
+      while (statusSelect.options.length > 1) {
+        statusSelect.remove(1);
+      }
+
+      if (!trackerId) {
+        statusSelect.value = '';
+        return;
+      }
+
+      // Fetch statuses for the selected tracker
+      fetch(statusUrl + '?tracker_id=' + encodeURIComponent(trackerId), {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(statuses) {
+        statuses.forEach(function(status) {
+          var option = document.createElement('option');
+          option.value = status.id;
+          option.text = status.name;
+          statusSelect.add(option);
+        });
+
+        // Restore previous selection if it's still available
+        var stillAvailable = statuses.some(function(s) { return s.id == currentStatusId; });
+        if (stillAvailable) {
+          statusSelect.value = currentStatusId;
+        } else {
+          statusSelect.value = '';
+        }
+      })
+      .catch(function(error) {
+        console.error('Error fetching statuses:', error);
+      });
+    });
+  }
+})();
+</script>

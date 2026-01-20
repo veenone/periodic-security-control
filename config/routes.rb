@@ -23,7 +23,9 @@ RedmineApp::Application.routes.draw do
   # Project-scoped routes
   resources :projects, only: [] do
     # Project settings for PSC
-    resource :psc_settings, only: [:edit, :update]
+    resource :psc_settings, only: [:edit, :update] do
+      get 'tracker_statuses', on: :collection
+    end
 
     # Project-scoped control points (standalone, not nested under categories)
     resources :psc_control_points, controller: 'psc_project_control_points' do

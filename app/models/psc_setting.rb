@@ -30,7 +30,7 @@ class PscSetting < (defined?(ApplicationRecord) == 'constant' ? ApplicationRecor
 
   def self.default_description_template
     <<~TEMPLATE
-      Security Control Check
+      Control Check
 
       Category: {{category}}
       Control: {{control_id}} - {{control_name}}

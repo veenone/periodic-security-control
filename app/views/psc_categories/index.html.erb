@@ -1,8 +1,8 @@
 <%= title l(:label_psc_categories) %>
 
 <div class="contextual">
-  <%= link_to l(:label_psc_category_new), new_project_psc_category_path(@project), class: 'icon icon-add' %>
-  <%= link_to l(:label_psc_export), export_project_psc_categories_path(@project, format: :csv), class: 'icon icon-download' %>
+  <%= link_to l(:label_psc_category_new), new_project_psc_category_path(@project), class: 'psc-btn psc-btn-primary' %>
+  <%= link_to l(:label_psc_export), export_project_psc_categories_path(@project, format: :csv), class: 'psc-btn psc-btn-secondary' %>
 </div>
 
 <div class="psc-section">

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-namespace :periodic_security_control do
-  desc 'Generate issues for due security control schedules'
+namespace :periodic_control do
+  desc 'Generate issues for due control schedules'
   task generate_issues: :environment do
-    puts "Generating issues for due security control schedules..."
+    puts "Generating issues for due control schedules..."
     result = PscScheduleGenerator.generate_due_issues
     puts "Generated #{result[:generated]} issues"
     if result[:errors].any?
@@ -51,7 +51,7 @@ namespace :periodic_security_control do
     year = (args[:year] || ENV['YEAR'] || Date.current.year).to_i
     stats = PscScheduleGenerator.statistics_for_year(year)
     puts ""
-    puts "Security Control Statistics for #{year}"
+    puts "Control Statistics for #{year}"
     puts "=" * 40
     puts "Total schedules:    #{stats[:total]}"
     puts "Pending:            #{stats[:pending]}"
@@ -79,15 +79,15 @@ namespace :periodic_security_control do
 
   desc 'Run all daily maintenance tasks'
   task daily: :environment do
-    Rake::Task['periodic_security_control:update_overdue'].invoke
-    Rake::Task['periodic_security_control:reset_missing_issues'].invoke
-    Rake::Task['periodic_security_control:generate_issues'].invoke
-    Rake::Task['periodic_security_control:sync_completed'].invoke
+    Rake::Task['periodic_control:update_overdue'].invoke
+    Rake::Task['periodic_control:reset_missing_issues'].invoke
+    Rake::Task['periodic_control:generate_issues'].invoke
+    Rake::Task['periodic_control:sync_completed'].invoke
   end
 
   desc 'Initialize plugin with sample data (for testing)'
   task seed: :environment do
-    puts "Creating sample security control categories and control points..."
+    puts "Creating sample control categories and control points..."
 
     categories_data = [
       { code: 'ACS', name: 'Access Control System', description: 'Physical access controls for badge management and access reviews' },
@@ -164,7 +164,7 @@ namespace :periodic_security_control do
 
     puts ""
     puts "Generating schedules for current year..."
-    Rake::Task['periodic_security_control:generate_schedules'].invoke(Date.current.year)
+    Rake::Task['periodic_control:generate_schedules'].invoke(Date.current.year)
 
     puts ""
     puts "Sample data created successfully!"

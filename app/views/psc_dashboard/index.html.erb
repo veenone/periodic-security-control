@@ -64,7 +64,7 @@
             <tr class="psc-status-overdue">
               <td>
                 <%= link_to schedule.control_point.full_control_id,
-                    psc_category_psc_control_point_path(schedule.control_point.category, schedule.control_point) %>
+                    psc_schedule_path(schedule) %>
               </td>
               <td><%= format_date(schedule.due_date) %></td>
               <td class="psc-days-overdue"><%= schedule.days_overdue %> <%= l(:label_days) %></td>
@@ -99,7 +99,7 @@
             <tr>
               <td>
                 <%= link_to schedule.control_point.full_control_id,
-                    psc_category_psc_control_point_path(schedule.control_point.category, schedule.control_point) %>
+                    psc_schedule_path(schedule) %>
               </td>
               <td><%= format_date(schedule.scheduled_date) %></td>
               <td><%= schedule.days_until_due || '-' %> <%= l(:label_days) %></td>
@@ -134,7 +134,7 @@
       <% @category_stats.each do |stat| %>
         <tr>
           <td>
-            <%= link_to stat[:category].name, psc_category_path(stat[:category]) %>
+            <%= link_to stat[:category].name, psc_schedules_path(year: @year, category_id: stat[:category].id) %>
             <span class="psc-category-code">(<%= stat[:category].code %>)</span>
           </td>
           <td class="center"><%= stat[:total] %></td>

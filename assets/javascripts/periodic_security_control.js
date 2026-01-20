@@ -1,4 +1,4 @@
-/* Periodic Security Control Plugin JavaScript */
+/* Periodic Control Plugin JavaScript */
 
 (function() {
   'use strict';

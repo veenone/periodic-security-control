@@ -1,4 +1,4 @@
-/* Periodic Security Control Plugin - Modern UI Styles */
+/* Periodic Control Plugin - Modern UI Styles */
 
 /* ===== CSS Variables ===== */
 :root {
@@ -887,10 +887,19 @@ td.control-id strong {
   color: white;
 }
 
+.psc-btn-primary:link,
+.psc-btn-primary:visited,
+.psc-btn-primary:active {
+  color: white;
+  text-decoration: none;
+}
+
 .psc-btn-primary:hover {
   background: var(--psc-primary-dark);
+  color: white;
   transform: translateY(-1px);
   box-shadow: var(--psc-shadow-md);
+  text-decoration: none;
 }
 
 .psc-btn-secondary {
@@ -899,9 +908,18 @@ td.control-id strong {
   border: 1px solid var(--psc-gray-300);
 }
 
+.psc-btn-secondary:link,
+.psc-btn-secondary:visited,
+.psc-btn-secondary:active {
+  color: var(--psc-gray-700);
+  text-decoration: none;
+}
+
 .psc-btn-secondary:hover {
   background: var(--psc-gray-50);
   border-color: var(--psc-gray-400);
+  color: var(--psc-gray-700);
+  text-decoration: none;
 }
 
 .psc-btn-success {
@@ -909,9 +927,25 @@ td.control-id strong {
   color: white;
 }
 
+.psc-btn-success:link,
+.psc-btn-success:visited,
+.psc-btn-success:hover,
+.psc-btn-success:active {
+  color: white;
+  text-decoration: none;
+}
+
 .psc-btn-danger {
   background: var(--psc-danger);
   color: white;
+}
+
+.psc-btn-danger:link,
+.psc-btn-danger:visited,
+.psc-btn-danger:hover,
+.psc-btn-danger:active {
+  color: white;
+  text-decoration: none;
 }
 
 /* Table buttons */
@@ -1877,4 +1911,11 @@ p.pagination {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ===== Contextual Buttons Spacing ===== */
+/* Ensure proper spacing when contextual buttons are followed by content */
+.contextual + .psc-section {
+  clear: both;
+  margin-top: 50px;
 }
