@@ -37,6 +37,14 @@
     </p>
 
     <p>
+      <label><%= l(:field_status) %></label>
+      <%= select_tag 'psc_setting[default_status_id]',
+                     options_from_collection_for_select(@statuses, :id, :name, @settings.default_status_id),
+                     include_blank: true %>
+      <em class="info"><%= l(:text_psc_default_status_help) %></em>
+    </p>
+
+    <p>
       <label><%= l(:setting_psc_issue_subject_template) %></label>
       <%= text_field_tag 'psc_setting[issue_subject_template]', @settings.issue_subject_template, size: 60 %>
     </p>

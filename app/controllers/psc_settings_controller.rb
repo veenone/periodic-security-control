@@ -8,6 +8,7 @@ class PscSettingsController < ApplicationController
     @settings = PscSetting.for_project(@project)
     @trackers = @project.trackers
     @priorities = IssuePriority.active
+    @statuses = IssueStatus.sorted
   end
 
   def update
@@ -20,6 +21,7 @@ class PscSettingsController < ApplicationController
     else
       @trackers = @project.trackers
       @priorities = IssuePriority.active
+      @statuses = IssueStatus.sorted
       render :edit
     end
   end

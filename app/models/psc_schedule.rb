@@ -61,11 +61,13 @@ class PscSchedule < (defined?(ApplicationRecord) == 'constant' ? ApplicationReco
 
     settings = PscSetting.for_project(project)
     control = control_point
+    tracker = control.tracker || settings.default_tracker || project.trackers.first
 
     new_issue = Issue.new(
       project: project,
-      tracker: control.tracker || settings.default_tracker || project.trackers.first,
+      tracker: tracker,
       priority: control.priority || settings.default_priority || IssuePriority.default,
+      status: settings.default_status || IssueStatus.default,
       author: author,
       assigned_to: control.assigned_to,
       subject: render_template(settings.issue_subject_template),

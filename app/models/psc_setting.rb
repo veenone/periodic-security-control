@@ -6,10 +6,11 @@ class PscSetting < (defined?(ApplicationRecord) == 'constant' ? ApplicationRecor
   belongs_to :project
   belongs_to :default_tracker, class_name: 'Tracker', optional: true
   belongs_to :default_priority, class_name: 'IssuePriority', optional: true
+  belongs_to :default_status, class_name: 'IssueStatus', optional: true
 
   validates :project_id, presence: true, uniqueness: true
 
-  safe_attributes 'default_tracker_id', 'default_priority_id',
+  safe_attributes 'default_tracker_id', 'default_priority_id', 'default_status_id',
                   'issue_subject_template', 'issue_description_template',
                   'advance_days', 'enable_auto_generation',
                   'weekly_start_day', 'monthly_start_day',
