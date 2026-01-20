@@ -176,6 +176,7 @@ en:
   notice_psc_schedule_reopened: "Schedule reopened."
   notice_psc_bulk_generate_success: "Generated %{count} issues successfully."
   notice_psc_bulk_generate_partial: "Generated %{count} issues. %{errors} errors occurred."
+  notice_psc_schedules_generated_no_issues: "Schedules generated for %{schedule_count} control points. No issues due yet."
   notice_psc_overdue_updated: "Updated %{count} schedules to overdue status."
   notice_psc_import_successful: "Imported %{count} records successfully."
 

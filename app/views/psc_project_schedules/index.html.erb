@@ -2,7 +2,7 @@
 
 <div class="contextual">
   <%= link_to l(:label_psc_calendar), calendar_project_psc_schedules_path(@project, year: @year), class: 'icon icon-calendar' %>
-  <%= link_to l(:label_psc_bulk_generate), bulk_generate_project_psc_schedules_path(@project), method: :post, class: 'icon icon-reload',
+  <%= link_to l(:label_psc_bulk_generate), bulk_generate_project_psc_schedules_path(@project, year: @year), method: :post, class: 'icon icon-reload',
               data: { confirm: l(:text_psc_bulk_generate_confirm) } %>
 </div>
 
@@ -34,11 +34,11 @@
         <th><%= l(:label_psc_category) %></th>
         <th><%= l(:field_control_id) %></th>
         <th><%= l(:field_name) %></th>
-        <th><%= sort_header_tag('scheduled_date', caption: l(:field_scheduled_date)) %></th>
-        <th><%= sort_header_tag('due_date', caption: l(:field_due_date)) %></th>
-        <th><%= sort_header_tag('status', caption: l(:field_status)) %></th>
+        <%= sort_header_tag('scheduled_date', caption: l(:field_scheduled_date)) %>
+        <%= sort_header_tag('due_date', caption: l(:field_due_date)) %>
+        <%= sort_header_tag('status', caption: l(:field_status)) %>
         <th><%= l(:field_issue) %></th>
-        <th></th>
+        <th><%= l(:label_actions) %></th>
       </tr>
     </thead>
     <tbody>

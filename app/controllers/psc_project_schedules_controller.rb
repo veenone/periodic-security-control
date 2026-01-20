@@ -96,12 +96,27 @@ class PscProjectSchedulesController < ApplicationController
   end
 
   def bulk_generate
+    year = params[:year]&.to_i || Date.current.year
     generated_count = 0
+    schedule_count = 0
     errors = []
 
-    schedules = PscSchedule.due_for_generation
+    # First, generate schedules for all active control points for the year
+    control_points = PscControlPoint.for_project(@project).active.includes(:category)
+    control_points.find_each do |control_point|
+      control_point.generate_schedules_for_year(year)
+      schedule_count += 1
+    end
+
+    # Get project settings for advance_days
+    settings = PscSetting.for_project(@project)
+    advance_days = settings&.advance_days || 7
+
+    # Then generate issues for all due schedules
+    schedules = PscSchedule.pending
                            .joins(control_point: :category)
                            .where(psc_control_categories: { project_id: @project.id })
+                           .where('scheduled_date <= ?', Date.current + advance_days.days)
 
     schedules.find_each do |schedule|
       issue = schedule.generate_issue!(@project, User.current)
@@ -114,11 +129,13 @@ class PscProjectSchedulesController < ApplicationController
 
     if errors.any?
       flash[:warning] = l(:notice_psc_bulk_generate_partial, count: generated_count, errors: errors.count)
-    else
+    elsif generated_count > 0
       flash[:notice] = l(:notice_psc_bulk_generate_success, count: generated_count)
+    else
+      flash[:notice] = l(:notice_psc_schedules_generated_no_issues, schedule_count: schedule_count)
     end
 
-    redirect_to project_psc_schedules_path(@project)
+    redirect_to project_psc_schedules_path(@project, year: year)
   end
 
   private
