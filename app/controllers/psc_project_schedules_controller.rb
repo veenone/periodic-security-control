@@ -99,6 +99,7 @@ class PscProjectSchedulesController < ApplicationController
     year = params[:year]&.to_i || Date.current.year
     generated_count = 0
     schedule_count = 0
+    reset_count = 0
     errors = []
 
     # First, generate schedules for all active control points for the year
@@ -108,11 +109,23 @@ class PscProjectSchedulesController < ApplicationController
       schedule_count += 1
     end
 
+    # Reset schedules where linked issue was deleted
+    orphaned_schedules = PscSchedule.where(status: 'generated')
+                                    .joins(control_point: :category)
+                                    .where(psc_control_categories: { project_id: @project.id })
+                                    .for_year(year)
+    orphaned_schedules.find_each do |schedule|
+      if schedule.issue_id.present? && !Issue.exists?(schedule.issue_id)
+        schedule.update!(status: 'pending', issue_id: nil, generated_at: nil)
+        reset_count += 1
+      end
+    end
+
     # Get project settings for advance_days
     settings = PscSetting.for_project(@project)
     advance_days = settings&.advance_days || 7
 
-    # Then generate issues for all due schedules
+    # Then generate issues for all due schedules (pending status)
     schedules = PscSchedule.pending
                            .joins(control_point: :category)
                            .where(psc_control_categories: { project_id: @project.id })
