@@ -85,19 +85,37 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   end
 
   def calculate_scheduled_date(year, period)
+    settings = project_settings
+
     case frequency
     when 'weekly'
-      Date.commercial(year, period, 1) # Monday of the week
+      # Start on configured day (1=Monday by default)
+      start_day = settings&.weekly_start_day || 1
+      Date.commercial(year, period, start_day)
     when 'monthly'
-      Date.new(year, period, 1)
+      # Start on configured day of month
+      start_day = settings&.monthly_start_day || 1
+      Date.new(year, period, [start_day, days_in_month(year, period)].min)
     when 'quarterly'
-      month = ((period - 1) * 3) + 1
-      Date.new(year, month, 1)
+      # Start month for Q1 (subsequent quarters offset by 3 months)
+      base_month = settings&.quarterly_start_month || 1
+      month = ((period - 1) * 3) + base_month
+      # Handle year overflow
+      actual_year = year + ((month - 1) / 12)
+      actual_month = ((month - 1) % 12) + 1
+      Date.new(actual_year, actual_month, 1)
     when 'six_monthly'
-      month = ((period - 1) * 6) + 1
-      Date.new(year, month, 1)
+      # Start month for first semi-annual period
+      base_month = settings&.six_monthly_start_month || 1
+      month = ((period - 1) * 6) + base_month
+      # Handle year overflow
+      actual_year = year + ((month - 1) / 12)
+      actual_month = ((month - 1) % 12) + 1
+      Date.new(actual_year, actual_month, 1)
     when 'yearly'
-      Date.new(year, 1, 1)
+      # Start month for the year (allows fiscal year configuration)
+      start_month = settings&.yearly_start_month || 1
+      Date.new(year, start_month, 1)
     else
       Date.new(year, period, 1)
     end
@@ -106,7 +124,8 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
   def calculate_due_date(scheduled_date)
     case frequency
     when 'weekly'
-      scheduled_date + 6.days # End of week (Sunday)
+      # End on Friday (working week end)
+      scheduled_date + (5 - scheduled_date.cwday).days
     when 'monthly'
       scheduled_date.end_of_month
     when 'quarterly'
@@ -114,10 +133,15 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
     when 'six_monthly'
       (scheduled_date + 5.months).end_of_month
     when 'yearly'
-      scheduled_date.end_of_year
+      (scheduled_date + 11.months).end_of_month
     else
       scheduled_date.end_of_month
     end
+  end
+
+  def project_settings
+    return nil unless category&.project
+    PscSetting.for_project(category.project)
   end
 
   def last_completed_schedule
@@ -142,6 +166,10 @@ class PscControlPoint < (defined?(ApplicationRecord) == 'constant' ? Application
 
   def format_control_id
     self.control_id = control_id.upcase.strip if control_id.present?
+  end
+
+  def days_in_month(year, month)
+    Date.new(year, month, -1).day
   end
 
   def calculate_next_date(from_date)

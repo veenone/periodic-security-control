@@ -61,6 +61,49 @@
         </ul>
       </div>
     </fieldset>
+
+    <h3><%= l(:label_psc_schedule_configuration) %></h3>
+
+    <p>
+      <label><%= l(:setting_psc_weekly_start_day) %></label>
+      <%= select_tag 'psc_setting[weekly_start_day]',
+                     options_for_select([
+                       [l(:day_name_monday), 1],
+                       [l(:day_name_tuesday), 2],
+                       [l(:day_name_wednesday), 3],
+                       [l(:day_name_thursday), 4],
+                       [l(:day_name_friday), 5]
+                     ], @settings.weekly_start_day) %>
+      <em class="info"><%= l(:text_psc_weekly_start_day_help) %></em>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_monthly_start_day) %></label>
+      <%= select_tag 'psc_setting[monthly_start_day]',
+                     options_for_select((1..28).map { |d| [d, d] }, @settings.monthly_start_day) %>
+      <em class="info"><%= l(:text_psc_monthly_start_day_help) %></em>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_quarterly_start_month) %></label>
+      <%= select_tag 'psc_setting[quarterly_start_month]',
+                     options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.quarterly_start_month) %>
+      <em class="info"><%= l(:text_psc_quarterly_start_month_help) %></em>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_six_monthly_start_month) %></label>
+      <%= select_tag 'psc_setting[six_monthly_start_month]',
+                     options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.six_monthly_start_month) %>
+      <em class="info"><%= l(:text_psc_six_monthly_start_month_help) %></em>
+    </p>
+
+    <p>
+      <label><%= l(:setting_psc_yearly_start_month) %></label>
+      <%= select_tag 'psc_setting[yearly_start_month]',
+                     options_for_select((1..12).map { |m| [l("date.month_names")[m], m] }, @settings.yearly_start_month) %>
+      <em class="info"><%= l(:text_psc_yearly_start_month_help) %></em>
+    </p>
   </div>
 
   <p>

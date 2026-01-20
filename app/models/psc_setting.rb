@@ -11,7 +11,9 @@ class PscSetting < (defined?(ApplicationRecord) == 'constant' ? ApplicationRecor
 
   safe_attributes 'default_tracker_id', 'default_priority_id',
                   'issue_subject_template', 'issue_description_template',
-                  'advance_days', 'enable_auto_generation'
+                  'advance_days', 'enable_auto_generation',
+                  'weekly_start_day', 'monthly_start_day',
+                  'quarterly_start_month', 'six_monthly_start_month', 'yearly_start_month'
 
   def self.for_project(project)
     find_or_create_by(project: project) do |s|
@@ -49,5 +51,31 @@ class PscSetting < (defined?(ApplicationRecord) == 'constant' ? ApplicationRecor
   def advance_days
     val = super
     val.present? && val > 0 ? val : 7
+  end
+
+  # Schedule configuration with defaults
+  def weekly_start_day
+    val = super
+    val.present? && val.between?(1, 5) ? val : 1 # 1=Monday
+  end
+
+  def monthly_start_day
+    val = super
+    val.present? && val.between?(1, 28) ? val : 1
+  end
+
+  def quarterly_start_month
+    val = super
+    val.present? && val.between?(1, 12) ? val : 1
+  end
+
+  def six_monthly_start_month
+    val = super
+    val.present? && val.between?(1, 12) ? val : 1
+  end
+
+  def yearly_start_month
+    val = super
+    val.present? && val.between?(1, 12) ? val : 1
   end
 end
