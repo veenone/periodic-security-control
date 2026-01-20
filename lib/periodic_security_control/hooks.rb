@@ -2,6 +2,11 @@
 
 module PeriodicSecurityControl
   class Hooks < Redmine::Hook::ViewListener
+    # Include plugin stylesheet in all pages
+    def view_layouts_base_html_head(context = {})
+      stylesheet_link_tag('periodic_security_control', plugin: 'periodic_security_control')
+    end
+
     # Show PSC information on issue show page
     render_on :view_issues_show_details_bottom, partial: 'hooks/view_issues_show_details'
 
